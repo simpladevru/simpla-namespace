@@ -24,17 +24,21 @@ class Variants extends Simpla
 		$variant_id_filter = '';
 		$instock_filter = '';
 		
-		if(!empty($filter['product_id']))
+		if(!empty($filter['product_id'])) {
 			$product_id_filter = $this->db->placehold('AND v.product_id in(?@)', (array)$filter['product_id']);
+        }
 		
-		if(!empty($filter['id']))
+		if(!empty($filter['id'])) {
 			$variant_id_filter = $this->db->placehold('AND v.id in(?@)', (array)$filter['id']);
+        }
 
-		if(!empty($filter['in_stock']) && $filter['in_stock'])
+		if(!empty($filter['in_stock']) && $filter['in_stock']) {
 			$instock_filter = $this->db->placehold('AND (v.stock>0 OR v.stock IS NULL)');
+        }
 
-		if(!$product_id_filter && !$variant_id_filter)
+		if(!$product_id_filter && !$variant_id_filter) {
 			return array();
+        }
 		
 		$query = $this->db->placehold("SELECT v.id, v.product_id , v.price, NULLIF(v.compare_price, 0) as compare_price, v.sku, IFNULL(v.stock, ?) as stock, (v.stock IS NULL) as infinity, v.name, v.attachment, v.position
 					FROM __variants AS v
@@ -53,8 +57,9 @@ class Variants extends Simpla
 	
 	public function get_variant($id)
 	{	
-		if(empty($id))
+		if(empty($id)) {
 			return false;
+        }
 			
 		$query = $this->db->placehold("SELECT v.id, v.product_id , v.price, NULLIF(v.compare_price, 0) as compare_price, v.sku, IFNULL(v.stock, ?) as stock, (v.stock IS NULL) as infinity, v.name, v.attachment
 					FROM __variants v WHERE v.id=?
@@ -86,7 +91,6 @@ class Variants extends Simpla
 			$this->delete_attachment($id);
 			$query = $this->db->placehold("DELETE FROM __variants WHERE id = ? LIMIT 1", intval($id));
 			$this->db->query($query);
-			$this->db->query('UPDATE __purchases SET variant_id=NULL WHERE variant_id=?', intval($id));
 		}
 	}
 	
@@ -98,8 +102,9 @@ class Variants extends Simpla
 		$query = $this->db->placehold("SELECT 1 FROM __variants WHERE attachment=? AND id!=?", $filename, $id);
 		$this->db->query($query);
 		$exists = $this->db->num_rows();
-		if(!empty($filename) && $exists == 0)
+		if(!empty($filename) && $exists == 0) {
 			@unlink($this->config->root_dir.'/'.$this->config->downloads_dir.$filename);
+        }
 		$this->update_variant($id, array('attachment'=>null));
 	}
 	

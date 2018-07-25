@@ -16,15 +16,16 @@ class Payment extends Simpla
 	public function get_payment_methods($filter = array())
 	{	
 		$delivery_filter = '';
-		if(!empty($filter['delivery_id']))
+		if(!empty($filter['delivery_id'])) {
 			$delivery_filter = $this->db->placehold('AND id in (SELECT payment_method_id FROM __delivery_payment dp WHERE dp.delivery_id=?)', intval($filter['delivery_id']));
+        }
 		
 		$enabled_filter = '';
- 		if(!empty($filter['enabled']))
+ 		if(!empty($filter['enabled'])) {
 			$enabled_filter = $this->db->placehold('AND enabled=?', intval($filter['enabled']));
+        }
 
-		$query = "SELECT *
-					FROM __payment_methods WHERE 1 $delivery_filter $enabled_filter ORDER BY position";
+		$query = "SELECT * FROM __payment_methods WHERE 1 $delivery_filter $enabled_filter ORDER BY position";
 	
 		$this->db->query($query);
 		return $this->db->results();
@@ -106,8 +107,7 @@ class Payment extends Simpla
 	
 	public function update_payment_settings($method_id, $settings)
 	{
-		if(!is_string($settings))
-		{
+		if(!is_string($settings)) {
 			$settings = serialize($settings);
 		}
 		$query = $this->db->placehold("UPDATE __payment_methods SET settings=? WHERE id in(?@) LIMIT 1", $settings, (array)$method_id);
@@ -120,18 +120,18 @@ class Payment extends Simpla
 		$query = $this->db->placehold("DELETE FROM __delivery_payment WHERE payment_method_id=?", intval($id));
 		$this->db->query($query);
 		if(is_array($deliveries_ids))
-		foreach($deliveries_ids as $d_id)
+		foreach($deliveries_ids as $d_id) {
 			$this->db->query("INSERT INTO __delivery_payment SET payment_method_id=?, delivery_id=?", $id, $d_id);
+        }
 	}		
 	
 	public function add_payment_method($payment_method)
 	{	
-		$query = $this->db->placehold('INSERT INTO __payment_methods
-		SET ?%',
-		$payment_method);
+		$query = $this->db->placehold('INSERT INTO __payment_methods SET ?%', $payment_method);
 
-		if(!$this->db->query($query))
+		if(!$this->db->query($query)) {
 			return false;
+        }
 
 		$id = $this->db->insert_id();
 		$this->db->query("UPDATE __payment_methods SET position=id WHERE id=?", $id);	
@@ -140,12 +140,7 @@ class Payment extends Simpla
 
 	public function delete_payment_method($id)
 	{
-		// Удаляем связь метода оплаты с достаками
-		$query = $this->db->placehold("DELETE FROM __delivery_payment WHERE payment_method_id=?", intval($id));
-		$this->db->query($query);
-	
-		if(!empty($id))
-		{
+		if(!empty($id)) {
 			$query = $this->db->placehold("DELETE FROM __payment_methods WHERE id=? LIMIT 1", intval($id));
 			$this->db->query($query);
 		}

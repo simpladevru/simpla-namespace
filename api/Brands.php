@@ -21,7 +21,6 @@ class Brands extends Simpla
 	*/
 	public function get_brands($filter = array())
 	{
-
 		$category_id_filter = '';
 		$visible_filter = '';
 		$in_stock_filter = '';
@@ -106,9 +105,7 @@ class Brands extends Simpla
 		{
 			$this->delete_image($id);	
 			$query = $this->db->placehold("DELETE FROM __brands WHERE id=? LIMIT 1", $id);
-			$this->db->query($query);		
-			$query = $this->db->placehold("UPDATE __products SET brand_id=NULL WHERE brand_id=?", $id);
-			$this->db->query($query);	
+			$this->db->query($query);
 		}
 	}
 	
