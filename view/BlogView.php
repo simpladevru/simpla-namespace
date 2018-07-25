@@ -2,6 +2,8 @@
 
 namespace Root\view;
 
+use Root\api\Simpla;
+
 /**
  * Simpla CMS
  *
@@ -35,7 +37,7 @@ class BlogView extends View
 	private function fetch_post($url)
 	{
 		// Выбираем пост из базы
-		$post = $this->blog->get_post($url);
+		$post = Simpla::$app->blog->get_post($url);
 		
 		// Если не найден - ошибка
 		if(!$post || (!$post->visible && empty($_SESSION['admin'])))
@@ -45,7 +47,6 @@ class BlogView extends View
 		if(!empty($this->user))
 			$this->design->assign('comment_name', $this->user->name);
 
-		
 		// Принимаем комментарий
 		if ($this->request->method('post') && $this->request->post('comment'))
 		{
@@ -84,7 +85,7 @@ class BlogView extends View
 					$comment->approved = 1;
 				
 				// Добавляем комментарий в базу
-				$comment_id = $this->comments->add_comment($comment);
+				$comment_id = Simpla::$app->comments->add_comment($comment);
 				
 				// Отправляем email
 				$this->notify->email_comment_admin($comment_id);				
@@ -96,13 +97,13 @@ class BlogView extends View
 		}
 		
 		// Комментарии к посту
-		$comments = $this->comments->get_comments(array('type'=>'blog', 'object_id'=>$post->id, 'approved'=>1, 'ip'=>$_SERVER['REMOTE_ADDR']));
+		$comments = Simpla::$app->comments->get_comments(array('type'=>'blog', 'object_id'=>$post->id, 'approved'=>1, 'ip'=>$_SERVER['REMOTE_ADDR']));
 		$this->design->assign('comments', $comments);
 		$this->design->assign('post',      $post);
 		
 		// Соседние записи
-		$this->design->assign('next_post', $this->blog->get_next_post($post->id));
-		$this->design->assign('prev_post', $this->blog->get_prev_post($post->id));
+		$this->design->assign('next_post', Simpla::$app->blog->get_next_post($post->id));
+		$this->design->assign('prev_post', Simpla::$app->blog->get_prev_post($post->id));
 		
 		// Мета-теги
 		$this->design->assign('meta_title', $post->meta_title);
@@ -131,7 +132,7 @@ class BlogView extends View
 		$this->design->assign('current_page_num', $current_page);
 
 		// Вычисляем количество страниц
-		$posts_count = $this->blog->count_posts($filter);
+		$posts_count = Simpla::$app->blog->count_posts($filter);
 
 		// Показать все страницы сразу
 		if($this->request->get('page') == 'all')
@@ -144,7 +145,7 @@ class BlogView extends View
 		$filter['limit'] = $items_per_page;
 		
 		// Выбираем статьи из базы
-		$posts = $this->blog->get_posts($filter);
+		$posts = Simpla::$app->blog->get_posts($filter);
 		if(empty($posts))
 			return false;
 		

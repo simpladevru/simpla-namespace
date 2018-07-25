@@ -2,6 +2,8 @@
 
 namespace Root\view;
 
+use Root\api\Simpla;
+
 /**
  * Simpla CMS
  *
@@ -19,31 +21,31 @@ class ProductView extends View
 	function fetch()
 	{   
 		$product_url = $this->request->get('product_url', 'string');
-		
+
 		if(empty($product_url))
 			return false;
 
 		// Выбираем товар из базы
-		$product = $this->products->get_product((string)$product_url);
+		$product = Simpla::$app->products->get_product((string)$product_url);
 		if(empty($product) || (!$product->visible && empty($_SESSION['admin'])))
 			return false;
 		
-		$product->images = $this->products->get_images(array('product_id'=>$product->id));
+		$product->images = Simpla::$app->products->get_images(array('product_id'=>$product->id));
 		$product->image = reset($product->images);
 
 		$variants = array();
-		foreach($this->variants->get_variants(array('product_id'=>$product->id, 'in_stock'=>true)) as $v)
+		foreach(Simpla::$app->variants->get_variants(array('product_id'=>$product->id, 'in_stock'=>true)) as $v)
 			$variants[$v->id] = $v;
 		
 		$product->variants = $variants;
 		
 		// Вариант по умолчанию
-		if(($v_id = $this->request->get('variant', 'integer'))>0 && isset($variants[$v_id]))
+		if(($v_id = Simpla::$app->request->get('variant', 'integer'))>0 && isset($variants[$v_id]))
 			$product->variant = $variants[$v_id];
 		else
 			$product->variant = reset($variants);
 					
-		$product->features = $this->features->get_product_options(array('product_id'=>$product->id));
+		$product->features = Simpla::$app->features->get_product_options(array('product_id'=>$product->id));
 	
 		// Автозаполнение имени для формы комментария
 		if(!empty($this->user))
@@ -90,7 +92,7 @@ class ProductView extends View
 				$comment_id = $this->comments->add_comment($comment);
 				
 				// Отправляем email
-				$this->notify->email_comment_admin($comment_id);				
+                Simpla::$app->notify->email_comment_admin($comment_id);
 				
 				// Приберем сохраненную капчу, иначе можно отключить загрузку рисунков и постить старую
 				unset($_SESSION['captcha_code']);
@@ -101,21 +103,21 @@ class ProductView extends View
 		// Связанные товары
 		$related_ids = array();
 		$related_products = array();
-		foreach($this->products->get_related_products($product->id) as $p)
+		foreach(Simpla::$app->products->get_related_products($product->id) as $p)
 		{
 			$related_ids[] = $p->related_id;
 			$related_products[$p->related_id] = null;
 		}
 		if(!empty($related_ids))
 		{
-			foreach($this->products->get_products(array('id'=>$related_ids, 'in_stock'=>1, 'visible'=>1)) as $p)
+			foreach(Simpla::$app->products->get_products(array('id'=>$related_ids, 'in_stock'=>1, 'visible'=>1)) as $p)
 				$related_products[$p->id] = $p;
 			
-			$related_products_images = $this->products->get_images(array('product_id'=>array_keys($related_products)));
+			$related_products_images = Simpla::$app->products->get_images(array('product_id'=>array_keys($related_products)));
 			foreach($related_products_images as $related_product_image)
 				if(isset($related_products[$related_product_image->product_id]))
 					$related_products[$related_product_image->product_id]->images[] = $related_product_image;
-			$related_products_variants = $this->variants->get_variants(array('product_id'=>array_keys($related_products), 'in_stock'=>1));
+			$related_products_variants = Simpla::$app->variants->get_variants(array('product_id'=>array_keys($related_products), 'in_stock'=>1));
 			foreach($related_products_variants as $related_product_variant)
 			{
 				if(isset($related_products[$related_product_variant->product_id]))
@@ -139,19 +141,19 @@ class ProductView extends View
 		}
 
 		// Отзывы о товаре
-		$comments = $this->comments->get_comments(array('type'=>'product', 'object_id'=>$product->id, 'approved'=>1, 'ip'=>$_SERVER['REMOTE_ADDR']));
+		$comments = Simpla::$app->comments->get_comments(array('type'=>'product', 'object_id'=>$product->id, 'approved'=>1, 'ip'=>$_SERVER['REMOTE_ADDR']));
 		
 		// Соседние товары
-		$this->design->assign('next_product', $this->products->get_next_product($product->id));
-		$this->design->assign('prev_product', $this->products->get_prev_product($product->id));
+		$this->design->assign('next_product', Simpla::$app->products->get_next_product($product->id));
+		$this->design->assign('prev_product', Simpla::$app->products->get_prev_product($product->id));
 
 		// И передаем его в шаблон
 		$this->design->assign('product', $product);
 		$this->design->assign('comments', $comments);
 		
 		// Категория и бренд товара
-		$product->categories = $this->categories->get_categories(array('product_id'=>$product->id));
-		$this->design->assign('brand', $this->brands->get_brand(intval($product->brand_id)));		
+		$product->categories = Simpla::$app->categories->get_categories(array('product_id'=>$product->id));
+		$this->design->assign('brand', Simpla::$app->brands->get_brand(intval($product->brand_id)));
 		$this->design->assign('category', reset($product->categories));		
 		
 

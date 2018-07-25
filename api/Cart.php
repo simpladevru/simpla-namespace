@@ -11,9 +11,8 @@ namespace Root\api;
  *
  */
 
-class Cart extends Simpla
+class Cart
 {
-
 	/*
 	*
 	* Функция возвращает корзину
@@ -34,7 +33,7 @@ class Cart extends Simpla
 		{
 			$session_items = $_SESSION['shopping_cart'];
 			
-			$variants = $this->variants->get_variants(array('id'=>array_keys($session_items)));
+			$variants = Simpla::$app->variants->get_variants(array('id'=>array_keys($session_items)));
 			if(!empty($variants))
 			{
  
@@ -47,10 +46,10 @@ class Cart extends Simpla
 				}
 	
 				$products = array();
-				foreach($this->products->get_products(array('id'=>$products_ids, 'limit' => count($products_ids))) as $p)
+				foreach(Simpla::$app->products->get_products(array('id'=>$products_ids, 'limit' => count($products_ids))) as $p)
 					$products[$p->id]=$p;
 				
-				$images = $this->products->get_images(array('product_id'=>$products_ids));
+				$images = Simpla::$app->products->get_images(array('product_id'=>$products_ids));
 				foreach($images as $image)
 					$products[$image->product_id]->images[$image->id] = $image;
 			
@@ -73,7 +72,7 @@ class Cart extends Simpla
 				
 				// Пользовательская скидка
 				$cart->discount = 0;
-				if(isset($_SESSION['user_id']) && $user = $this->users->get_user(intval($_SESSION['user_id'])))
+				if(isset($_SESSION['user_id']) && $user = Simpla::$app->users->get_user(intval($_SESSION['user_id'])))
 					$cart->discount = $user->discount;
 					
 				$cart->total_price *= (100-$cart->discount)/100;
@@ -81,8 +80,8 @@ class Cart extends Simpla
 				// Скидка по купону
 				if(isset($_SESSION['coupon_code']))
 				{
-					$cart->coupon = $this->coupons->get_coupon($_SESSION['coupon_code']);
-					if($cart->coupon && $cart->coupon->valid && $cart->total_price>=$cart->coupon->min_order_price)
+					$cart->coupon = Simpla::$app->coupons->get_coupon($_SESSION['coupon_code']);
+					if($cart->coupon && Simpla::$app->coupon->valid && $cart->total_price>=$cart->coupon->min_order_price)
 					{
 						if($cart->coupon->type=='absolute')
 						{
@@ -121,7 +120,7 @@ class Cart extends Simpla
       		$amount = max(1, $amount+$_SESSION['shopping_cart'][$variant_id]);
 
 		// Выберем товар из базы, заодно убедившись в его существовании
-		$variant = $this->variants->get_variant($variant_id);
+		$variant = Simpla::$app->variants->get_variant($variant_id);
 
 		// Если товар существует, добавим его в корзину
 		if(!empty($variant) && ($variant->stock>0) )
@@ -143,7 +142,7 @@ class Cart extends Simpla
 		$amount = max(1, $amount);
 		
 		// Выберем товар из базы, заодно убедившись в его существовании
-		$variant = $this->variants->get_variant($variant_id);
+		$variant = Simpla::$app->variants->get_variant($variant_id);
 
 		// Если товар существует, добавим его в корзину
 		if(!empty($variant) && $variant->stock>0)
@@ -185,7 +184,7 @@ class Cart extends Simpla
 	*/
 	public function apply_coupon($coupon_code)
 	{
-		$coupon = $this->coupons->get_coupon((string)$coupon_code);
+		$coupon = Simpla::$app->coupons->get_coupon((string)$coupon_code);
 		if($coupon && $coupon->valid)
 		{
 			$_SESSION['coupon_code'] = $coupon->code;

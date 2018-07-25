@@ -11,8 +11,15 @@ namespace Root\api;
  *
  */
 
-class Users extends Simpla
-{	
+class Users
+{
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
+
 	// осторожно, при изменении соли испортятся текущие пароли пользователей
 	private $salt = '8e86a279d6e182b3c811c559e6b15484';	
 	

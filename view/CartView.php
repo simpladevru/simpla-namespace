@@ -1,6 +1,8 @@
 <?PHP
 
 namespace Root\view;
+use Root\api\Simpla;
+
 /**
  * Simpla CMS
  *
@@ -25,15 +27,15 @@ class CartView extends View
     // Если передан id варианта, добавим его в корзину
     if($variant_id = $this->request->get('variant', 'integer'))
     {
-		$this->cart->add_item($variant_id, $this->request->get('amount', 'integer'));
-	    header('location: '.$this->config->root_url.'/cart/');
+        Simpla::$app->cart->add_item($variant_id, $this->request->get('amount', 'integer'));
+	    header('location: '.Simpla::$app->config->root_url.'/cart/');
 		
     }
 
     // Удаление товара из корзины
     if($delete_variant_id = intval($this->request->get('delete_variant')))
     {
-      $this->cart->delete_item($delete_variant_id);
+        Simpla::$app->cart->delete_item($delete_variant_id);
       if(!isset($_POST['submit_order']) || $_POST['submit_order']!=1)
 			header('location: '.$this->config->root_url.'/cart/');
 	}
@@ -129,27 +131,27 @@ class CartView extends View
 	    {
 			foreach($amounts as $variant_id=>$amount)
 			{
-				$this->cart->update_item($variant_id, $amount);         
+                Simpla::$app->cart->update_item($variant_id, $amount);
 			}
 
 	    	$coupon_code = trim($this->request->post('coupon_code', 'string'));
 	    	if(empty($coupon_code))
 	    	{
-	    		$this->cart->apply_coupon('');
-				header('location: '.$this->config->root_url.'/cart/');	    		
+                Simpla::$app->cart->apply_coupon('');
+				header('location: '.Simpla::$app->config->root_url.'/cart/');
 	    	}
 	    	else
 	    	{
-				$coupon = $this->coupons->get_coupon((string)$coupon_code);
+				$coupon = Simpla::$app->coupons->get_coupon((string)$coupon_code);
 
 				if(empty($coupon) || !$coupon->valid)
 				{
-		    		$this->cart->apply_coupon($coupon_code);
+                    Simpla::$app->cart->apply_coupon($coupon_code);
 					$this->design->assign('coupon_error', 'invalid');
 				}
 				else
 				{
-					$this->cart->apply_coupon($coupon_code);
+                    Simpla::$app->cart->apply_coupon($coupon_code);
 					header('location: '.$this->config->root_url.'/cart/');
 				}
 	    	}
@@ -166,13 +168,13 @@ class CartView extends View
 	function fetch()
 	{  
 		// Способы доставки
-		$deliveries = $this->delivery->get_deliveries(array('enabled'=>1));
+		$deliveries = Simpla::$app->delivery->get_deliveries(array('enabled'=>1));
 		$this->design->assign('deliveries', $deliveries);
 		
 		// Данные пользователя
 		if($this->user)
 		{
-			$last_order = $this->orders->get_orders(array('user_id'=>$this->user->id, 'limit'=>1));
+			$last_order = Simpla::$app->orders->get_orders(array('user_id'=>$this->user->id, 'limit'=>1));
 			$last_order = reset($last_order);
 			if($last_order)
 			{
@@ -189,7 +191,7 @@ class CartView extends View
 		}
 		
 		// Если существуют валидные купоны, нужно вывести инпут для купона
-		if($this->coupons->count_coupons(array('valid'=>1))>0)
+		if(Simpla::$app->coupons->count_coupons(array('valid'=>1))>0)
 			$this->design->assign('coupon_request', true);
 
 		// Выводим корзину

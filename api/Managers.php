@@ -11,7 +11,7 @@ namespace Root\api;
  *
  */
 
-class Managers extends Simpla
+class Managers
 {	
 	public $permissions_list = array('products', 'categories', 'brands', 'features', 'orders', 'labels',
 		'users', 'groups', 'coupons', 'pages', 'blog', 'comments', 'feedbacks', 'import', 'export',

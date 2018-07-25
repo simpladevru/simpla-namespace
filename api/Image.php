@@ -11,16 +11,20 @@ namespace Root\api;
  *
  */
 
-class Image extends Simpla
+class Image
 {
 	private	$allowed_extentions = array('png', 'gif', 'jpg', 'jpeg', 'ico');
 
+	private $config;
+	private $settings;
+
 	public function __construct()
-	{		
-		parent::__construct();
+	{
+        $this->config   = Simpla::$app->config;
+        $this->settings = Simpla::$app->settings;
 	}
-	
-	
+
+
 	/**
 	 * Создание превью изображения
 	 * @param $filename файл с изображением (без пути к файлу)

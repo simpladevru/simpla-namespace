@@ -1,0 +1,1 @@
+<h1>{$page->meta_title|escape}</h1>

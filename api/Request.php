@@ -11,16 +11,13 @@ namespace Root\api;
  *
  */
 
-class Request extends Simpla
+class Request
 {
-
 	/**
 	 * Конструктор, чистка слешей
 	 */
 	public function __construct()
-	{		
-		parent::__construct();
-		
+	{
 		$_POST = $this->stripslashes_recursive($_POST);
 		$_GET = $this->stripslashes_recursive($_GET);	
 	}

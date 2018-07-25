@@ -11,8 +11,15 @@ namespace Root\api;
  *
  */
 
-class Brands extends Simpla
+class Brands
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
+
 	/*
 	*
 	* Функция возвращает массив брендов, удовлетворяющих фильтру

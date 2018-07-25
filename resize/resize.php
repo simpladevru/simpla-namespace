@@ -7,13 +7,11 @@ require_once __DIR__ . '/../bootstrap/app.php';
 $filename = $_GET['file'];
 $token = $_GET['token'];
 
-$simpla = new Simpla();
-
-if(!$simpla->config->check_token($filename, $token)) {
+if(!Simpla::$app->config->check_token($filename, $token)) {
 	exit('bad token');
 }
 
-$resized_filename =  $simpla->image->resize($filename);
+$resized_filename = Simpla::$app->image->resize($filename);
 
 if(is_readable($resized_filename))
 {

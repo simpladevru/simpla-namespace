@@ -1,7 +1,7 @@
 <?PHP
 
 namespace Root\view;
-use Root\helpers\Debug;
+use Root\api\Simpla;
 
 /**
  * Simpla CMS
@@ -16,74 +16,72 @@ use Root\helpers\Debug;
  *
  */
 
-class IndexView extends View
+class IndexView
 {	
 	public $modules_dir = 'view/';
 
-	public function __construct()
-	{
-		parent::__construct();
-	}
+	private $module;
+	private $body;
 
-	/**
-	 *
-	 * Отображение
-	 *
-	 */
 	function fetch()
 	{
-		// Содержимое корзины
-		$this->design->assign('cart',		$this->cart->get_cart());
-	
-        // Категории товаров
-		$this->design->assign('categories', $this->categories->get_categories_tree());
-		
-		// Страницы
-		$pages = $this->pages->get_pages(array('visible'=>1));		
-		$this->design->assign('pages', $pages);
+	    $module = $this->get_module();
 
-        // Текущий модуль (для отображения центрального блока)
-		$module = $this->request->get('module', 'string');
-		$module = preg_replace("/[^A-Za-z0-9]+/", "", $module);
+        if ( !($content = $module->fetch()) ) {
+            $content = $this->not_found()->fetch();
+		}
 
-		// Если не задан - берем из настроек
-		if(empty($module)) {
-			return false;
-        }
-		//$module = $this->settings->main_module;
+        Simpla::$app->design->assign('content', $content);
+        Simpla::$app->design->assign('module', $this->module);
 
-        $module = "Root\\view\\" . $module;
-
-		// Создаем соответствующий класс
-        if (class_exists($module)) {
-            $this->main = new $module($this);
-        } else {
-            return false;
-        }
-
-		// Создаем основной блок страницы
-		if (!$content = $this->main->fetch()) {
-			return false;
-		}		
-
-		// Передаем основной блок в шаблон
-		$this->design->assign('content', $content);		
-		
-		// Передаем название модуля в шаблон, это может пригодиться
-		$this->design->assign('module', $module);
-				
-		// Создаем текущую обертку сайта (обычно index.tpl)
-		$wrapper = $this->design->get_var('wrapper');
-		if(is_null($wrapper)) {
+		if(is_null( $wrapper = Simpla::$app->design->get_var('wrapper') )) {
 			$wrapper = 'index.tpl';
         }
-			
-		if(!empty($wrapper)) {
-			return $this->body = $this->design->fetch($wrapper);
-        }
-		else {
-			return $this->body = $content;
-        }
 
+        $this->body = !empty($wrapper)
+            ? Simpla::$app->design->fetch($wrapper)
+            : $content;
+
+        $this->print_result($this->body);
 	}
+
+	public function get_module()
+    {
+        $this->module = Simpla::$app->request->get('module', 'string');
+        $this->module = preg_replace("/[^A-Za-z0-9]+/", "", $this->module);
+
+        $module = "Root\\view\\" . $this->module;
+
+        if(!class_exists($module)) {
+            return false;
+        }
+        return new $module;
+    }
+
+    /**
+     * @return NotFoundView
+     */
+	public function not_found()
+    {
+        return new NotFoundView();
+    }
+
+    /**
+     * @param $res
+     */
+	public function print_result($res)
+    {
+        // Выводим результат
+        header("Content-type: text/html; charset=UTF-8");
+
+        print $res;
+
+        // Сохраняем последнюю просмотренную страницу в переменной $_SESSION['last_visited_page']
+        if(empty($_SESSION['last_visited_page']) || empty($_SESSION['current_page']) || $_SERVER['REQUEST_URI'] !== $_SESSION['current_page']) {
+            if(!empty($_SESSION['current_page']) && !empty($_SESSION['last_visited_page']) && $_SESSION['last_visited_page'] !== $_SESSION['current_page']) {
+                $_SESSION['last_visited_page'] = $_SESSION['current_page'];
+            }
+            $_SESSION['current_page'] = $_SERVER['REQUEST_URI'];
+        }
+    }
 }

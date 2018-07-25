@@ -10,8 +10,15 @@ namespace Root\api;
  * @author		Denis Pikusov
  *
  */
-class Delivery extends Simpla
+class Delivery
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
+
 	public function get_delivery($id)
 	{
 		$query = $this->db->placehold("SELECT id, name, description, free_from, price, enabled, position, separate_payment FROM __delivery WHERE id=? LIMIT 1", intval($id));

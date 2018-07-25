@@ -11,8 +11,15 @@ namespace Root\api;
  *
  */
  
-class Notify extends Simpla
+class Notify
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
+
     function email($to, $subject, $message, $from = '', $reply_to = '')
     {
     	$headers = "MIME-Version: 1.0\n" ;

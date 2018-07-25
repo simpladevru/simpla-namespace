@@ -11,9 +11,6 @@ namespace Root\view;
  * @copyright 	2010 Denis Pikusov
  * @link 		http://simplacms.ru
  * @author 		Denis Pikusov
- *
- * 
- *
  */
 
 class MainView extends View

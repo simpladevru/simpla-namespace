@@ -11,14 +11,21 @@ namespace Root\api;
  *
  */
 
-class Categories extends Simpla
+class Categories
 {
 	// Список указателей на категории в дереве категорий (ключ = id категории)
 	private $all_categories;
 	// Дерево категорий
 	private $categories_tree;
 
-	// Функция возвращает массив категорий
+	private $db;
+
+	public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
+
+    // Функция возвращает массив категорий
 	public function get_categories($filter = array())
 	{
 		if(!isset($this->categories_tree))

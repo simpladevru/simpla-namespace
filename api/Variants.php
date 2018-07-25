@@ -11,9 +11,16 @@ namespace Root\api;
  *
  */
 
-class Variants extends Simpla
+class Variants
 {
-	/**
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
+
+    /**
 	* Функция возвращает варианты товара
 	* @param	$filter
 	* @retval	array
@@ -39,7 +46,7 @@ class Variants extends Simpla
 		if(!$product_id_filter && !$variant_id_filter) {
 			return array();
         }
-		
+
 		$query = $this->db->placehold("SELECT v.id, v.product_id , v.price, NULLIF(v.compare_price, 0) as compare_price, v.sku, IFNULL(v.stock, ?) as stock, (v.stock IS NULL) as infinity, v.name, v.attachment, v.position
 					FROM __variants AS v
 					WHERE 
@@ -48,8 +55,8 @@ class Variants extends Simpla
 					$variant_id_filter  
 					$instock_filter 
 					ORDER BY v.position       
-					", $this->settings->max_order_amount);
-		
+					", Simpla::$app->settings->max_order_amount);
+
 		$this->db->query($query);	
 		return $this->db->results();
 	}
@@ -63,7 +70,7 @@ class Variants extends Simpla
 			
 		$query = $this->db->placehold("SELECT v.id, v.product_id , v.price, NULLIF(v.compare_price, 0) as compare_price, v.sku, IFNULL(v.stock, ?) as stock, (v.stock IS NULL) as infinity, v.name, v.attachment
 					FROM __variants v WHERE v.id=?
-					LIMIT 1", $this->settings->max_order_amount, $id);
+					LIMIT 1", settings()->max_order_amount, $id);
 		
 		$this->db->query($query);	
 		$variant = $this->db->result();

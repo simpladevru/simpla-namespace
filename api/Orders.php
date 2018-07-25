@@ -11,8 +11,14 @@ namespace Root\api;
  *
  */
 
-class Orders extends Simpla
+class Orders
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
 
 	public function get_order($id)
 	{

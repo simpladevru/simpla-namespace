@@ -11,15 +11,17 @@ namespace Root\api;
  *
  */
 
-class Money extends Simpla
+class Money
 {
 	private $currencies = array();
 	private $currency;
 
+	private $db;
+
 	public function __construct()
 	{
-		parent::__construct();
-		
+	    $this->db = Simpla::$app->db;
+
 		if(isset($this->settings->price_decimals_point)) {
 			$this->decimals_point = $this->settings->price_decimals_point;
         }
@@ -28,7 +30,7 @@ class Money extends Simpla
 			$this->thousands_separator = $this->settings->price_thousands_separator;
         }
 
-		$this->design->smarty->registerPlugin('modifier', 'convert', array($this, 'convert'));
+		Simpla::$app->design->smarty->registerPlugin('modifier', 'convert', array($this, 'convert'));
 
 		$this->init_currencies();
 	}

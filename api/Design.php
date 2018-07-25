@@ -11,13 +11,17 @@ use Smarty;
  * @author		Denis Pikusov
  *
  */
-class Design extends Simpla
+class Design
 {
 	public $smarty;
 
+	private $config;
+    private $settings;
+
 	public function __construct()
 	{
-		parent::__construct();
+		$this->settings = Simpla::$app->settings;
+		$this->config = Simpla::$app->config;
 
 		// Создаем и настраиваем Смарти
 		$this->smarty = new Smarty();
@@ -208,11 +212,12 @@ class Design extends Simpla
 
 	public function resize_modifier($filename, $width=0, $height=0, $set_watermark=false)
 	{
-		$resized_filename = $this->image->add_resize_params($filename, $width, $height, $set_watermark);
+		$resized_filename = Simpla::$app->image->add_resize_params($filename, $width, $height, $set_watermark);
 		$resized_filename_encoded = $resized_filename;
 		
-		if(substr($resized_filename_encoded, 0, 7) == 'http://')
+		if(substr($resized_filename_encoded, 0, 7) == 'http://') {
 			$resized_filename_encoded = rawurlencode($resized_filename_encoded);
+        }
 
 		$resized_filename_encoded = rawurlencode($resized_filename_encoded);
 
@@ -221,15 +226,17 @@ class Design extends Simpla
 
 	public function token_modifier($text)
 	{
-		return $this->config->token($text);
+		return Simpla::$app->config->token($text);
 	}
 
 	public function url_modifier($params)
 	{
-		if(is_array(reset($params)))
-			return $this->request->url(reset($params));
-		else
-			return $this->request->url($params);
+		if(is_array(reset($params))) {
+			return Simpla::$app->request->url(reset($params));
+        }
+		else {
+			return Simpla::$app->request->url($params);
+        }
 	}
 
 	public function plural_modifier($number, $singular, $plural1, $plural2=null)
@@ -276,7 +283,7 @@ class Design extends Simpla
 	{
 		if(empty($date))
 			$date = date("Y-m-d");
-	    return date(empty($format)?$this->settings->date_format:$format, strtotime($date));
+	    return date(empty($format)?Simpla::$app->settings->date_format:$format, strtotime($date));
 	}
 	
 	public function time_modifier($date, $format = null)

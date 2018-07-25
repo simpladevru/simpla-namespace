@@ -11,8 +11,15 @@ namespace Root\api;
  *
  */
 
-class Products extends Simpla
+class Products
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
+
 	/**
 	* Функция возвращает товары
 	* Возможные значения фильтра:

@@ -11,21 +11,23 @@ namespace Root\api;
  *
  */
 
-class Pages extends Simpla
+class Pages
 {
+    private $db;
 
-	/*
-	*
-	* Функция возвращает страницу по ее id или url (в зависимости от типа)
-	* @param $id id или url страницы
-	*
-	*/
-	public function get_page($id)
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
+
+    public function get_page($id)
 	{
-		if(gettype($id) == 'string')
+		if(gettype($id) == 'string') {
 			$where = $this->db->placehold(' WHERE url=? ', $id);
-		else
+        }
+		else {
 			$where = $this->db->placehold(' WHERE id=? ', intval($id));
+        }
 		
 		$query = "SELECT id, url, header, name, meta_title, meta_description, meta_keywords, body, menu_id, position, visible
 		          FROM __pages $where LIMIT 1";
@@ -46,19 +48,22 @@ class Pages extends Simpla
 		$visible_filter = '';
 		$pages = array();
 
-		if(isset($filter['menu_id']))
+		if(isset($filter['menu_id'])) {
 			$menu_filter = $this->db->placehold('AND menu_id in (?@)', (array)$filter['menu_id']);
+        }
 
-		if(isset($filter['visible']))
+		if(isset($filter['visible'])) {
 			$visible_filter = $this->db->placehold('AND visible = ?', intval($filter['visible']));
+        }
 		
 		$query = "SELECT id, url, header, name, meta_title, meta_description, meta_keywords, body, menu_id, position, visible
 		          FROM __pages WHERE 1 $menu_filter $visible_filter ORDER BY position";
 	
 		$this->db->query($query);
 		
-		foreach($this->db->results() as $page)
+		foreach($this->db->results() as $page) {
 			$pages[$page->id] = $page;
+        }
 			
 		return $pages;
 	}
@@ -71,8 +76,9 @@ class Pages extends Simpla
 	public function add_page($page)
 	{	
 		$query = $this->db->placehold('INSERT INTO __pages SET ?%', $page);
-		if(!$this->db->query($query))
+		if(!$this->db->query($query)) {
 			return false;
+        }
 
 		$id = $this->db->insert_id();
 		$this->db->query("UPDATE __pages SET position=id WHERE id=?", $id);	
@@ -87,8 +93,9 @@ class Pages extends Simpla
 	public function update_page($id, $page)
 	{	
 		$query = $this->db->placehold('UPDATE __pages SET ?% WHERE id in (?@)', $page, (array)$id);
-		if(!$this->db->query($query))
+		if(!$this->db->query($query)) {
 			return false;
+        }
 		return $id;
 	}
 	
@@ -99,11 +106,11 @@ class Pages extends Simpla
 	*/	
 	public function delete_page($id)
 	{
-		if(!empty($id))
-		{
+		if(!empty($id)) {
 			$query = $this->db->placehold("DELETE FROM __pages WHERE id=? LIMIT 1", intval($id));
-			if($this->db->query($query))
+			if($this->db->query($query)) {
 				return true;
+            }
 		}
 		return false;
 	}	
@@ -118,8 +125,9 @@ class Pages extends Simpla
 		$menus = array();
 		$query = "SELECT * FROM __menu ORDER BY position";
 		$this->db->query($query);
-		foreach($this->db->results() as $menu)
+		foreach($this->db->results() as $menu) {
 			$menus[$menu->id] = $menu;
+        }
 		return $menus;
 	}
 	

@@ -11,8 +11,15 @@ namespace Root\api;
  *
  */
 
-class Features extends Simpla
+class Features
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
+
 	function get_features($filter = array())
 	{
 		$category_id_filter = '';	

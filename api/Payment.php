@@ -11,8 +11,15 @@ namespace Root\api;
  *
  */
 
-class Payment extends Simpla
+class Payment
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
+
 	public function get_payment_methods($filter = array())
 	{	
 		$delivery_filter = '';

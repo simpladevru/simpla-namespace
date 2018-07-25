@@ -11,8 +11,14 @@ namespace Root\api;
  *
  */
 
-class Coupons extends Simpla
+class Coupons
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
 
 	/*
 	*

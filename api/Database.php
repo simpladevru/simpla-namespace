@@ -10,17 +10,19 @@ namespace Root\api;
  * @author 		Denis Pikusov
  *
  */
-class Database extends Simpla
+class Database
 {
 	private $mysqli;
 	private $res;
+
+	private $config;
 
 	/**
 	 * В конструкторе подключаем базу
 	 */
 	public function __construct()
 	{
-		parent::__construct();
+        $this->config = Simpla::$app->config;
 		$this->connect();
 	}
 
@@ -29,6 +31,7 @@ class Database extends Simpla
 	 */
 	public function __destruct()
 	{
+	    $this->config = Simpla::$app->config;
 		$this->disconnect();
 	}
 
@@ -37,22 +40,18 @@ class Database extends Simpla
 	 */
 	public function connect()
 	{
-		// При повторном вызове возвращаем существующий линк
-		if(!empty($this->mysqli))
+		if(!empty($this->mysqli)) {
 			return $this->mysqli;
-		// Иначе устанавливаем соединение
-		else
+        }
+		else {
 			$this->mysqli = new \mysqli($this->config->db_server, $this->config->db_user, $this->config->db_password, $this->config->db_name);
+        }
 		
-		// Выводим сообщение, в случае ошибки
-		if($this->mysqli->connect_error)
-		{
+		if($this->mysqli->connect_error) {
 			trigger_error("Could not connect to the database: ".$this->mysqli->connect_error, E_USER_WARNING);
 			return false;
 		}
-		// Или настраиваем соединение
-		else
-		{
+		else {
 			if($this->config->db_charset) {
 				$this->mysqli->query('SET NAMES '.$this->config->db_charset);
             }
@@ -116,8 +115,7 @@ class Database extends Simpla
 		if(!empty($args))
 		{
 			$result = $this->sql_placeholder_ex($tmpl, $args, $error); 
-			if ($result === false)
-			{ 
+			if ($result === false) {
 				$error = "Placeholder substitution error. Diagnostics: \"$error\""; 
 				trigger_error($error, E_USER_WARNING); 
 				return false; 

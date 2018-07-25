@@ -11,8 +11,14 @@ namespace Root\api;
  *
  */
 
-class Comments extends Simpla
+class Comments
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
 
 	// Возвращает комментарий по id
 	public function get_comment($id)

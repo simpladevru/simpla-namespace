@@ -11,8 +11,14 @@ namespace Root\api;
  *
  */
 
-class Blog extends Simpla
+class Blog
 {
+    private $db;
+
+    public function __construct()
+    {
+        $this->db = Simpla::$app->db;
+    }
 
 	/*
 	*
