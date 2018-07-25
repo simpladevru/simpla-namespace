@@ -23,7 +23,7 @@ if( !function_exists('design') )
     /**
      * @return \Root\api\Design
      */
-    function request()
+    function design()
     {
         return simpla('design');
     }
