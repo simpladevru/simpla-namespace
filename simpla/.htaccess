@@ -1,0 +1,5 @@
+AddType application/octet-stream csv
+AuthName "Simpla CMS"
+AuthType Basic
+AuthUserFile /Users/davinci/Server/www/simpla/simpla-namespace/simpla/.passwd
+require valid-user

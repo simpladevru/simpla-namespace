@@ -1,0 +1,21 @@
+{
+    "name": "simpla/cms",
+    "description": "The Simpla Cms",
+    "authors": [
+        {
+            "name": "DaVinci",
+            "email": "support@simpladev.ru"
+        }
+    ],
+    "require": {
+        "smarty/smarty": "^3.1",
+        "pclzip/pclzip": "^2.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Root\\": ".",
+            "View\\": "view",
+            "Api\\": "api"
+        }
+    }
+}

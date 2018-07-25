@@ -1,0 +1,74 @@
+;<? exit(); ?>
+
+license = "89bcdcfbij onjmmglmrk tptvrpxtq5 cdaa8dafa7 iiijjjgmhj hjqrlnplsn vsu9v28354 decfeghgfi ijliihhogn qonotpqxwv w8368b8b6d dfadghjejl nilhkllj qvvxp5x9x8 5a6fbdbcac ekiljfhpgp lrlnotrskn v5sbx5x496 497ebcfdbk ihgplrjrhs injqpqo8u7 s9q71b8h8c 9gglbgbiaj djlpjtonqr p8u8p6p9ob 897i7gacbb 8ffhgmdmes mnlwnuptr9 vdu8o8xbv9 8idi5ddj7e ekbkgqmkkr lrq8s4s7s8 rbxcva7d6h dh8lekfqep iqjmhplxjw oasbtdrbta zf4c "
+
+[database]
+
+;Сервер базы данных
+db_server = "localhost"
+
+;Пользователь базы данных
+db_user = "root"
+
+;Пароль к базе
+db_password = "root"
+
+;Имя базы
+db_name = "simpla_namespace"
+
+;Префикс для таблиц
+db_prefix = s_;
+
+;Кодировка базы данных
+db_charset = UTF8;
+
+;Режим SQL
+db_sql_mode = ' ';
+
+;Смещение часового пояса
+;db_timezone = +04:00;
+
+
+[php]
+error_reporting = E_ALL;
+php_charset = UTF8;
+php_locale_collate = ru_RU;
+php_locale_ctype = ru_RU;
+php_locale_monetary = ru_RU;
+php_locale_numeric = ru_RU;
+php_locale_time = ru_RU;
+;php_timezone = Europe/Moscow;
+
+logfile = admin/log/log.txt;
+
+[smarty]
+
+smarty_compile_check = true;
+smarty_caching = false;
+smarty_cache_lifetime = 0;
+smarty_debugging = false;
+smarty_html_minify = false;
+
+[images]
+;Использовать imagemagick для обработки изображений (вместо gd)
+use_imagick = true;
+
+;Директория оригиналов изображений
+original_images_dir = files/originals/;
+
+;Директория миниатюр
+resized_images_dir = files/products/;
+
+;Изображения категорий
+categories_images_dir = files/categories/;
+
+;Изображения брендов
+brands_images_dir = files/brands/;
+
+;Файл изображения с водяным знаком
+watermark_file = simpla/files/watermark/watermark.png;
+
+[files]
+
+;Директория хранения цифровых товаров
+downloads_dir = files/downloads/;
