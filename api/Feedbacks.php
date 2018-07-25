@@ -13,19 +13,12 @@ namespace Root\api;
 
 class Feedbacks
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Simpla::$app->db;
-    }
-
 	public function get_feedback($id)
 	{
-		$query = $this->db->placehold("SELECT f.id, f.name, f.email, f.ip, f.message, f.date FROM __feedbacks f WHERE id=? LIMIT 1", intval($id));
+		$query = db()->placehold("SELECT f.id, f.name, f.email, f.ip, f.message, f.date FROM __feedbacks f WHERE id=? LIMIT 1", intval($id));
 
-		if($this->db->query($query))
-			return $this->db->result();
+		if(db()->query($query))
+			return db()->result();
 		else
 			return false; 
 	}
@@ -43,13 +36,13 @@ class Feedbacks
 		if(isset($filter['page']))
 			$page = max(1, intval($filter['page']));
 
-		$sql_limit = $this->db->placehold(' LIMIT ?, ? ', ($page-1)*$limit, $limit);
+		$sql_limit = db()->placehold(' LIMIT ?, ? ', ($page-1)*$limit, $limit);
 
 		if(!empty($filter['keyword']))
 		{
 			$keywords = explode(' ', $filter['keyword']);
 			foreach($keywords as $keyword)
-				$keyword_filter .= $this->db->placehold('AND f.name LIKE "%'.$this->db->escape(trim($keyword)).'%" OR f.message LIKE "%'.$this->db->escape(trim($keyword)).'%" OR f.email LIKE "%'.$this->db->escape(trim($keyword)).'%" ');
+				$keyword_filter .= db()->placehold('AND f.name LIKE "%'.db()->escape(trim($keyword)).'%" OR f.message LIKE "%'.db()->escape(trim($keyword)).'%" OR f.email LIKE "%'.db()->escape(trim($keyword)).'%" ');
 		}
 			
 		if($new_on_top)
@@ -57,11 +50,11 @@ class Feedbacks
 		else
 			$sort='ASC';
 
-		$query = $this->db->placehold("SELECT f.id, f.name, f.email, f.ip, f.message, f.date
+		$query = db()->placehold("SELECT f.id, f.name, f.email, f.ip, f.message, f.date
 										FROM __feedbacks f WHERE 1 $keyword_filter ORDER BY f.id $sort $sql_limit");
 	
-		$this->db->query($query);
-		return $this->db->results();
+		db()->query($query);
+		return db()->results();
 	}
 	
 	public function count_feedbacks($filter = array())
@@ -72,29 +65,29 @@ class Feedbacks
 		{
 			$keywords = explode(' ', $filter['keyword']);
 			foreach($keywords as $keyword)
-				$keyword_filter .= $this->db->placehold('AND f.name LIKE "%'.$this->db->escape(trim($keyword)).'%" OR f.message LIKE "%'.$this->db->escape(trim($keyword)).'%" OR f.email LIKE "%'.$this->db->escape(trim($keyword)).'%" ');
+				$keyword_filter .= db()->placehold('AND f.name LIKE "%'.db()->escape(trim($keyword)).'%" OR f.message LIKE "%'.db()->escape(trim($keyword)).'%" OR f.email LIKE "%'.db()->escape(trim($keyword)).'%" ');
 		}
 
-		$query = $this->db->placehold("SELECT count(distinct f.id) as count
+		$query = db()->placehold("SELECT count(distinct f.id) as count
 										FROM __feedbacks f WHERE 1 $keyword_filter");
 	
-		$this->db->query($query);	
-		return $this->db->result('count');
+		db()->query($query);	
+		return db()->result('count');
 
 	}
 	
 	
 	public function add_feedback($feedback)
 	{	
-		$query = $this->db->placehold('INSERT INTO __feedbacks
+		$query = db()->placehold('INSERT INTO __feedbacks
 		SET ?%,
 		date = NOW()',
 		$feedback);
 		
-		if(!$this->db->query($query))
+		if(!db()->query($query))
 			return false;
 
-		$id = $this->db->insert_id();
+		$id = db()->insert_id();
 		return $id;
 	}
 	
@@ -106,10 +99,10 @@ class Feedbacks
 		{
 			$date = $feedback->date;
 			unset($feedback->date);
-			$date_query = $this->db->placehold(', date=STR_TO_DATE(?, ?)', $date, $this->settings->date_format);
+			$date_query = db()->placehold(', date=STR_TO_DATE(?, ?)', $date, $this->settings->date_format);
 		}
-		$query = $this->db->placehold("UPDATE __feedbacks SET ?% $date_query WHERE id in(?@) LIMIT 1", $feedback, (array)$id);
-		$this->db->query($query);
+		$query = db()->placehold("UPDATE __feedbacks SET ?% $date_query WHERE id in(?@) LIMIT 1", $feedback, (array)$id);
+		db()->query($query);
 		return $id;
 	}
 
@@ -118,8 +111,8 @@ class Feedbacks
 	{
 		if(!empty($id))
 		{
-			$query = $this->db->placehold("DELETE FROM __feedbacks WHERE id=? LIMIT 1", intval($id));
-			$this->db->query($query);
+			$query = db()->placehold("DELETE FROM __feedbacks WHERE id=? LIMIT 1", intval($id));
+			db()->query($query);
 		}
 	}	
 }

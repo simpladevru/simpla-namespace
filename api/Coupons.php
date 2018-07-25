@@ -13,13 +13,6 @@ namespace Root\api;
 
 class Coupons
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Simpla::$app->db;
-    }
-
 	/*
 	*
 	* Функция возвращает купон по его id или url
@@ -30,15 +23,15 @@ class Coupons
 	public function get_coupon($id)
 	{
 		if(gettype($id) == 'string')
-			$where = $this->db->placehold('WHERE c.code=? ', $id);
+			$where = db()->placehold('WHERE c.code=? ', $id);
 		else
-			$where = $this->db->placehold('WHERE c.id=? ', $id);
+			$where = db()->placehold('WHERE c.id=? ', $id);
 		
-		$query = $this->db->placehold("SELECT c.id, c.code, c.value, c.type, c.expire, min_order_price, c.single, c.usages,
+		$query = db()->placehold("SELECT c.id, c.code, c.value, c.type, c.expire, min_order_price, c.single, c.usages,
 										((DATE(NOW()) <= DATE(c.expire) OR c.expire IS NULL) AND (c.usages=0 OR NOT c.single)) AS valid
 		                               FROM __coupons c $where LIMIT 1");
-		if($this->db->query($query))
-			return $this->db->result();
+		if(db()->query($query))
+			return db()->result();
 		else
 			return false; 
 	}
@@ -65,31 +58,31 @@ class Coupons
 			$page = max(1, intval($filter['page']));
 
 		if(!empty($filter['id']))
-			$coupon_id_filter = $this->db->placehold('AND c.id in(?@)', (array)$filter['id']);
+			$coupon_id_filter = db()->placehold('AND c.id in(?@)', (array)$filter['id']);
 			
 		if(isset($filter['valid']))
 			if($filter['valid'])
-				$valid_filter = $this->db->placehold('AND ((DATE(NOW()) <= DATE(c.expire) OR c.expire IS NULL) AND (c.usages=0 OR NOT c.single))');		
+				$valid_filter = db()->placehold('AND ((DATE(NOW()) <= DATE(c.expire) OR c.expire IS NULL) AND (c.usages=0 OR NOT c.single))');		
 			else
-				$valid_filter = $this->db->placehold('AND NOT ((DATE(NOW()) <= DATE(c.expire) OR c.expire IS NULL) AND (c.usages=0 OR NOT c.single))');		
+				$valid_filter = db()->placehold('AND NOT ((DATE(NOW()) <= DATE(c.expire) OR c.expire IS NULL) AND (c.usages=0 OR NOT c.single))');		
 		
 		if(isset($filter['keyword']))
 		{
 			$keywords = explode(' ', $filter['keyword']);
 			foreach($keywords as $keyword)
-				$keyword_filter .= $this->db->placehold('AND (b.name LIKE "%'.$this->db->escape(trim($keyword)).'%" OR b.meta_keywords LIKE "%'.$this->db->escape(trim($keyword)).'%") ');
+				$keyword_filter .= db()->placehold('AND (b.name LIKE "%'.db()->escape(trim($keyword)).'%" OR b.meta_keywords LIKE "%'.db()->escape(trim($keyword)).'%") ');
 		}
 
-		$sql_limit = $this->db->placehold(' LIMIT ?, ? ', ($page-1)*$limit, $limit);
+		$sql_limit = db()->placehold(' LIMIT ?, ? ', ($page-1)*$limit, $limit);
 
-		$query = $this->db->placehold("SELECT c.id, c.code, c.value, c.type, c.expire, min_order_price, c.single, c.usages,
+		$query = db()->placehold("SELECT c.id, c.code, c.value, c.type, c.expire, min_order_price, c.single, c.usages,
 										((DATE(NOW()) <= DATE(c.expire) OR c.expire IS NULL) AND (c.usages=0 OR NOT c.single)) AS valid
 		                                      FROM __coupons c WHERE 1 $coupon_id_filter $valid_filter $keyword_filter
 		                                      ORDER BY valid DESC, id DESC $sql_limit",
 		                                      $this->settings->date_format);
 		
-		$this->db->query($query);
-		return $this->db->results();
+		db()->query($query);
+		return db()->results();
 	}
 	
 	
@@ -105,23 +98,23 @@ class Coupons
 		$valid_filter = '';
 		
 		if(!empty($filter['id']))
-			$coupon_id_filter = $this->db->placehold('AND c.id in(?@)', (array)$filter['id']);
+			$coupon_id_filter = db()->placehold('AND c.id in(?@)', (array)$filter['id']);
 			
 		if(isset($filter['valid']))
-			$valid_filter = $this->db->placehold('AND ((DATE(NOW()) <= DATE(c.expire) OR c.expire IS NULL) AND (c.usages=0 OR NOT c.single))');		
+			$valid_filter = db()->placehold('AND ((DATE(NOW()) <= DATE(c.expire) OR c.expire IS NULL) AND (c.usages=0 OR NOT c.single))');		
 
 		if(isset($filter['keyword']))
 		{
 			$keywords = explode(' ', $filter['keyword']);
 			foreach($keywords as $keyword)
-				$keyword_filter .= $this->db->placehold('AND (b.name LIKE "%'.$this->db->escape(trim($keyword)).'%" OR b.meta_keywords LIKE "%'.$this->db->escape(trim($keyword)).'%") ');
+				$keyword_filter .= db()->placehold('AND (b.name LIKE "%'.db()->escape(trim($keyword)).'%" OR b.meta_keywords LIKE "%'.db()->escape(trim($keyword)).'%") ');
 		}
 		
 		$query = "SELECT COUNT(distinct c.id) as count
 		          FROM __coupons c WHERE 1 $coupon_id_filter $valid_filter";
 
-		if($this->db->query($query))
-			return $this->db->result('count');
+		if(db()->query($query))
+			return db()->result('count');
 		else
 			return false;
 	}
@@ -136,12 +129,12 @@ class Coupons
 	{	
 		if(empty($coupon->single))
 			$coupon->single = 0;
-		$query = $this->db->placehold("INSERT INTO __coupons SET ?%", $coupon);
+		$query = db()->placehold("INSERT INTO __coupons SET ?%", $coupon);
 		
-		if(!$this->db->query($query))
+		if(!db()->query($query))
 			return false;
 		else
-			return $this->db->insert_id();
+			return db()->insert_id();
 	}
 	
 	
@@ -153,8 +146,8 @@ class Coupons
 	*/	
 	public function update_coupon($id, $coupon)
 	{
-		$query = $this->db->placehold("UPDATE __coupons SET ?% WHERE id in(?@) LIMIT ?", $coupon, (array)$id, count((array)$id));
-		$this->db->query($query);
+		$query = db()->placehold("UPDATE __coupons SET ?% WHERE id in(?@) LIMIT ?", $coupon, (array)$id, count((array)$id));
+		db()->query($query);
 		return $id;
 	}
 
@@ -169,8 +162,8 @@ class Coupons
 	{
 		if(!empty($id))
 		{
-			$query = $this->db->placehold("DELETE FROM __coupons WHERE id=? LIMIT 1", intval($id));
-			return $this->db->query($query);
+			$query = db()->placehold("DELETE FROM __coupons WHERE id=? LIMIT 1", intval($id));
+			return db()->query($query);
 		}
 	}	
 	

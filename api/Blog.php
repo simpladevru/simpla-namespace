@@ -13,13 +13,6 @@ namespace Root\api;
 
 class Blog
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Simpla::$app->db;
-    }
-
 	/*
 	*
 	* Функция возвращает пост по его id или url
@@ -30,15 +23,15 @@ class Blog
 	public function get_post($id)
 	{
 		if(is_int($id))
-			$where = $this->db->placehold(' WHERE b.id=? ', intval($id));
+			$where = db()->placehold(' WHERE b.id=? ', intval($id));
 		else
-			$where = $this->db->placehold(' WHERE b.url=? ', $id);
+			$where = db()->placehold(' WHERE b.url=? ', $id);
 		
-		$query = $this->db->placehold("SELECT b.id, b.url, b.name, b.annotation, b.text, b.meta_title,
+		$query = db()->placehold("SELECT b.id, b.url, b.name, b.annotation, b.text, b.meta_title,
 		                               b.meta_keywords, b.meta_description, b.visible, b.date
 		                               FROM __blog b $where LIMIT 1");
-		if($this->db->query($query))
-			return $this->db->result();
+		if(db()->query($query))
+			return db()->result();
 		else
 			return false; 
 	}
@@ -66,28 +59,28 @@ class Blog
 			$page = max(1, intval($filter['page']));
 
 		if(!empty($filter['id']))
-			$post_id_filter = $this->db->placehold('AND b.id in(?@)', (array)$filter['id']);
+			$post_id_filter = db()->placehold('AND b.id in(?@)', (array)$filter['id']);
 			
 		if(isset($filter['visible']))
-			$visible_filter = $this->db->placehold('AND b.visible = ?', intval($filter['visible']));		
+			$visible_filter = db()->placehold('AND b.visible = ?', intval($filter['visible']));		
 		
 		if(isset($filter['keyword']))
 		{
 			$keywords = explode(' ', $filter['keyword']);
 			foreach($keywords as $keyword)
-				$keyword_filter .= $this->db->placehold('AND (b.name LIKE "%'.$this->db->escape(trim($keyword)).'%" OR b.meta_keywords LIKE "%'.$this->db->escape(trim($keyword)).'%") ');
+				$keyword_filter .= db()->placehold('AND (b.name LIKE "%'.db()->escape(trim($keyword)).'%" OR b.meta_keywords LIKE "%'.db()->escape(trim($keyword)).'%") ');
 		}
 
-		$sql_limit = $this->db->placehold(' LIMIT ?, ? ', ($page-1)*$limit, $limit);
+		$sql_limit = db()->placehold(' LIMIT ?, ? ', ($page-1)*$limit, $limit);
 
-		$query = $this->db->placehold("SELECT b.id, b.url, b.name, b.annotation, b.text,
+		$query = db()->placehold("SELECT b.id, b.url, b.name, b.annotation, b.text,
 		                                      b.meta_title, b.meta_keywords, b.meta_description, b.visible,
 		                                      b.date
 		                                      FROM __blog b WHERE 1 $post_id_filter $visible_filter $keyword_filter
 		                                      ORDER BY date DESC, id DESC $sql_limit");
 		
-		$this->db->query($query);
-		return $this->db->results();
+		db()->query($query);
+		return db()->results();
 	}
 	
 	
@@ -104,23 +97,23 @@ class Blog
 		$keyword_filter = '';
 		
 		if(!empty($filter['id']))
-			$post_id_filter = $this->db->placehold('AND b.id in(?@)', (array)$filter['id']);
+			$post_id_filter = db()->placehold('AND b.id in(?@)', (array)$filter['id']);
 			
 		if(isset($filter['visible']))
-			$visible_filter = $this->db->placehold('AND b.visible = ?', intval($filter['visible']));		
+			$visible_filter = db()->placehold('AND b.visible = ?', intval($filter['visible']));		
 
 		if(isset($filter['keyword']))
 		{
 			$keywords = explode(' ', $filter['keyword']);
 			foreach($keywords as $keyword)
-				$keyword_filter .= $this->db->placehold('AND (b.name LIKE "%'.$this->db->escape(trim($keyword)).'%" OR b.meta_keywords LIKE "%'.$this->db->escape(trim($keyword)).'%") ');
+				$keyword_filter .= db()->placehold('AND (b.name LIKE "%'.db()->escape(trim($keyword)).'%" OR b.meta_keywords LIKE "%'.db()->escape(trim($keyword)).'%") ');
 		}
 		
 		$query = "SELECT COUNT(distinct b.id) as count
 		          FROM __blog b WHERE 1 $post_id_filter $visible_filter $keyword_filter";
 
-		if($this->db->query($query))
-			return $this->db->result('count');
+		if(db()->query($query))
+			return db()->result('count');
 		else
 			return false;
 	}
@@ -137,12 +130,12 @@ class Blog
 			$date_query = ', date=NOW()';
 		else
 			$date_query = '';
-		$query = $this->db->placehold("INSERT INTO __blog SET ?% $date_query", $post);
+		$query = db()->placehold("INSERT INTO __blog SET ?% $date_query", $post);
 		
-		if(!$this->db->query($query))
+		if(!db()->query($query))
 			return false;
 		else
-			return $this->db->insert_id();
+			return db()->insert_id();
 	}
 	
 	
@@ -154,8 +147,8 @@ class Blog
 	*/	
 	public function update_post($id, $post)
 	{
-		$query = $this->db->placehold("UPDATE __blog SET ?% WHERE id in(?@) LIMIT ?", $post, (array)$id, count((array)$id));
-		$this->db->query($query);
+		$query = db()->placehold("UPDATE __blog SET ?% WHERE id in(?@) LIMIT ?", $post, (array)$id, count((array)$id));
+		db()->query($query);
 		return $id;
 	}
 
@@ -170,11 +163,11 @@ class Blog
 	{
 		if(!empty($id))
 		{
-			$query = $this->db->placehold("DELETE FROM __blog WHERE id=? LIMIT 1", intval($id));
-			if($this->db->query($query))
+			$query = db()->placehold("DELETE FROM __blog WHERE id=? LIMIT 1", intval($id));
+			if(db()->query($query))
 			{
-				$query = $this->db->placehold("DELETE FROM __comments WHERE type='blog' AND object_id=?", intval($id));
-				if($this->db->query($query))
+				$query = db()->placehold("DELETE FROM __comments WHERE type='blog' AND object_id=?", intval($id));
+				if(db()->query($query))
 					return true;
 			}							
 		}
@@ -190,14 +183,14 @@ class Blog
 	*/	
 	public function get_next_post($id)
 	{
-		$this->db->query("SELECT date FROM __blog WHERE id=? LIMIT 1", $id);
-		$date = $this->db->result('date');
+		db()->query("SELECT date FROM __blog WHERE id=? LIMIT 1", $id);
+		$date = db()->result('date');
 
-		$this->db->query("(SELECT id FROM __blog WHERE date=? AND id>? AND visible  ORDER BY id limit 1)
+		db()->query("(SELECT id FROM __blog WHERE date=? AND id>? AND visible  ORDER BY id limit 1)
 		                   UNION
 		                  (SELECT id FROM __blog WHERE date>? AND visible ORDER BY date, id limit 1)",
 		                  $date, $id, $date);
-		$next_id = $this->db->result('id');
+		$next_id = db()->result('id');
 		if($next_id)
 			return $this->get_post(intval($next_id));
 		else
@@ -212,14 +205,14 @@ class Blog
 	*/	
 	public function get_prev_post($id)
 	{
-		$this->db->query("SELECT date FROM __blog WHERE id=? LIMIT 1", $id);
-		$date = $this->db->result('date');
+		db()->query("SELECT date FROM __blog WHERE id=? LIMIT 1", $id);
+		$date = db()->result('date');
 
-		$this->db->query("(SELECT id FROM __blog WHERE date=? AND id<? AND visible ORDER BY id DESC limit 1)
+		db()->query("(SELECT id FROM __blog WHERE date=? AND id<? AND visible ORDER BY id DESC limit 1)
 		                   UNION
 		                  (SELECT id FROM __blog WHERE date<? AND visible ORDER BY date DESC, id DESC limit 1)",
 		                  $date, $id, $date);
-		$prev_id = $this->db->result('id');
+		$prev_id = db()->result('id');
 		if($prev_id)
 			return $this->get_post(intval($prev_id));
 		else

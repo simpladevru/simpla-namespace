@@ -20,9 +20,11 @@ class ProductView extends View
 
 	function fetch()
 	{   
-		$product_url = $this->request->get('product_url', 'string');
+		//$product_url = $this->request->get('product_url', 'string');
         //$product_url = request()->get('product_url', 'string');
         //$product_url = Simpla::$app->request->get('product_url', 'string');
+        //$product_url = simpla()->request->get('product_url', 'string');
+        $product_url = simpla('request')->get('product_url', 'string');
 
 		if(empty($product_url))
 			return false;

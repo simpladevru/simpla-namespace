@@ -13,44 +13,37 @@ namespace Root\api;
 
 class Payment
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Simpla::$app->db;
-    }
-
 	public function get_payment_methods($filter = array())
 	{	
 		$delivery_filter = '';
 		if(!empty($filter['delivery_id'])) {
-			$delivery_filter = $this->db->placehold('AND id in (SELECT payment_method_id FROM __delivery_payment dp WHERE dp.delivery_id=?)', intval($filter['delivery_id']));
+			$delivery_filter = db()->placehold('AND id in (SELECT payment_method_id FROM __delivery_payment dp WHERE dp.delivery_id=?)', intval($filter['delivery_id']));
         }
 		
 		$enabled_filter = '';
  		if(!empty($filter['enabled'])) {
-			$enabled_filter = $this->db->placehold('AND enabled=?', intval($filter['enabled']));
+			$enabled_filter = db()->placehold('AND enabled=?', intval($filter['enabled']));
         }
 
 		$query = "SELECT * FROM __payment_methods WHERE 1 $delivery_filter $enabled_filter ORDER BY position";
 	
-		$this->db->query($query);
-		return $this->db->results();
+		db()->query($query);
+		return db()->results();
 	}
 	
 	function get_payment_method($id)
 	{
-		$query = $this->db->placehold("SELECT * FROM __payment_methods WHERE id=? LIMIT 1", intval($id));
-		$this->db->query($query);
-		$payment_method = $this->db->result();
+		$query = db()->placehold("SELECT * FROM __payment_methods WHERE id=? LIMIT 1", intval($id));
+		db()->query($query);
+		$payment_method = db()->result();
   		return $payment_method;
 	}
 	
 	function get_payment_settings($method_id)
 	{
-		$query = $this->db->placehold("SELECT settings FROM __payment_methods WHERE id=? LIMIT 1", intval($method_id));
-		$this->db->query($query);
-		$settings = $this->db->result('settings');
+		$query = db()->placehold("SELECT settings FROM __payment_methods WHERE id=? LIMIT 1", intval($method_id));
+		db()->query($query);
+		$settings = db()->result('settings');
  
 		$settings = unserialize($settings);
 		return $settings;
@@ -100,15 +93,15 @@ class Payment
 	
 	public function get_payment_deliveries($id)
 	{
-		$query = $this->db->placehold("SELECT delivery_id FROM __delivery_payment WHERE payment_method_id=?", intval($id));
-		$this->db->query($query);
-		return $this->db->results('delivery_id');
+		$query = db()->placehold("SELECT delivery_id FROM __delivery_payment WHERE payment_method_id=?", intval($id));
+		db()->query($query);
+		return db()->results('delivery_id');
 	}		
 	
 	public function update_payment_method($id, $payment_method)
 	{
-		$query = $this->db->placehold("UPDATE __payment_methods SET ?% WHERE id in(?@)", $payment_method, (array)$id);
-		$this->db->query($query);
+		$query = db()->placehold("UPDATE __payment_methods SET ?% WHERE id in(?@)", $payment_method, (array)$id);
+		db()->query($query);
 		return $id;
 	}
 	
@@ -117,39 +110,39 @@ class Payment
 		if(!is_string($settings)) {
 			$settings = serialize($settings);
 		}
-		$query = $this->db->placehold("UPDATE __payment_methods SET settings=? WHERE id in(?@) LIMIT 1", $settings, (array)$method_id);
-		$this->db->query($query);
+		$query = db()->placehold("UPDATE __payment_methods SET settings=? WHERE id in(?@) LIMIT 1", $settings, (array)$method_id);
+		db()->query($query);
 		return $method_id;
 	}
 	
 	public function update_payment_deliveries($id, $deliveries_ids)
 	{
-		$query = $this->db->placehold("DELETE FROM __delivery_payment WHERE payment_method_id=?", intval($id));
-		$this->db->query($query);
+		$query = db()->placehold("DELETE FROM __delivery_payment WHERE payment_method_id=?", intval($id));
+		db()->query($query);
 		if(is_array($deliveries_ids))
 		foreach($deliveries_ids as $d_id) {
-			$this->db->query("INSERT INTO __delivery_payment SET payment_method_id=?, delivery_id=?", $id, $d_id);
+			db()->query("INSERT INTO __delivery_payment SET payment_method_id=?, delivery_id=?", $id, $d_id);
         }
 	}		
 	
 	public function add_payment_method($payment_method)
 	{	
-		$query = $this->db->placehold('INSERT INTO __payment_methods SET ?%', $payment_method);
+		$query = db()->placehold('INSERT INTO __payment_methods SET ?%', $payment_method);
 
-		if(!$this->db->query($query)) {
+		if(!db()->query($query)) {
 			return false;
         }
 
-		$id = $this->db->insert_id();
-		$this->db->query("UPDATE __payment_methods SET position=id WHERE id=?", $id);	
+		$id = db()->insert_id();
+		db()->query("UPDATE __payment_methods SET position=id WHERE id=?", $id);	
 		return $id;
 	}
 
 	public function delete_payment_method($id)
 	{
 		if(!empty($id)) {
-			$query = $this->db->placehold("DELETE FROM __payment_methods WHERE id=? LIMIT 1", intval($id));
-			$this->db->query($query);
+			$query = db()->placehold("DELETE FROM __payment_methods WHERE id=? LIMIT 1", intval($id));
+			db()->query($query);
 		}
 	}	
 

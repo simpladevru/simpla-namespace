@@ -17,27 +17,24 @@ class Database
 
 	private $config;
 
-	/**
-	 * В конструкторе подключаем базу
-	 */
-	public function __construct()
+    /**
+     * Database constructor.
+     * @param $config
+     */
+	public function __construct($config)
 	{
-        $this->config = Simpla::$app->config;
+        $this->config = $config;
 		$this->connect();
 	}
 
-	/**
-	 * В деструкторе отсоединяемся от базы
-	 */
 	public function __destruct()
 	{
-	    $this->config = Simpla::$app->config;
 		$this->disconnect();
 	}
 
-	/**
-	 * Подключение к базе данных
-	 */
+    /**
+     * @return bool|\mysqli
+     */
 	public function connect()
 	{
 		if(!empty($this->mysqli)) {
@@ -67,45 +64,46 @@ class Database
 		return $this->mysqli;
 	}
 
-	/**
-	 * Закрываем подключение к базе данных
-	 */
+    /**
+     * @return bool
+     */
 	public function disconnect()
 	{
-		if(!@$this->mysqli->close())
+		if(!@$this->mysqli->close()) {
 			return true;
-		else
+        }
+		else {
 			return false;
+        }
 	}
-	
 
-	/**
-	 * Запрос к базе. Обазятелен первый аргумент - текст запроса.
-	 * При указании других аргументов автоматически выполняется placehold() для запроса с подстановкой этих аргументов
-	 */
+
+    /**
+     * @return mixed
+     */
 	public function query()
 	{
-		if(is_object($this->res))
+		if(is_object($this->res)) {
 			$this->res->free();
-			
+        }
 		$args = func_get_args();
 		$q = call_user_func_array(array($this, 'placehold'), $args);		
  		return $this->res = $this->mysqli->query($q);
 	}
-	
 
-	/**
-	 *  Экранирование
-	 */
+
+    /**
+     * @param $str
+     * @return mixed
+     */
 	public function escape($str)
 	{
 		return $this->mysqli->real_escape_string($str);
 	}
 
-	
-	/**
-	 * Плейсхолдер для запросов. Пример работы: $query = $db->placehold('SELECT name FROM products WHERE id=?', $id);
-	 */
+    /**
+     * @return bool|mixed|null|string|string[]
+     */
 	public function placehold()
 	{
 		$args = func_get_args();	
@@ -125,11 +123,11 @@ class Database
 		else
 			return $tmpl;
 	}
-	
 
-	/**
-	 * Возвращает результаты запроса. Необязательный второй аргумент указывает какую колонку возвращать вместо всего массива колонок
-	 */
+    /**
+     * @param null $field
+     * @return array|bool
+     */
 	public function results($field = null)
 	{
 		$results = array();
@@ -152,9 +150,10 @@ class Database
 		return $results;
 	}
 
-	/**
-	 * Возвращает первый результат запроса. Необязательный второй аргумент указывает какую колонку возвращать вместо всего массива колонок
-	 */
+    /**
+     * @param null $field
+     * @return bool|int
+     */
 	public function result($field = null)
 	{
 		$result = array();
@@ -172,33 +171,34 @@ class Database
 			return $row;
 	}
 
-	/**
-	 * Возвращает последний вставленный id
-	 */
+    /**
+     * @return mixed
+     */
 	public function insert_id()
 	{
 		return $this->mysqli->insert_id;
 	}
 
-	/**
-	 * Возвращает количество выбранных строк
-	 */
+    /**
+     * @return mixed
+     */
 	public function num_rows()
 	{
 		return $this->res->num_rows;
 	}
 
-	/**
-	 * Возвращает количество затронутых строк
-	 */
+    /**
+     * @return mixed
+     */
 	public function affected_rows()
 	{
 		return $this->mysqli->affected_rows;
 	}
-	
-	/**
-	 * Компиляция плейсхолдера
-	 */
+
+    /**
+     * @param $tmpl
+     * @return array
+     */
 	private function sql_compile_placeholder($tmpl)
 	{ 
 		$compiled = array(); 
@@ -233,11 +233,14 @@ class Database
 			$compiled[] = array($key, $type, $start, $p - $start); 
 		} 
 		return array($compiled, $tmpl, $has_named); 
-	} 
+	}
 
-	/**
-	 * Выполнение плейсхолдера
-	 */
+    /**
+     * @param $tmpl
+     * @param $args
+     * @param $errormsg
+     * @return bool|string
+     */
 	private function sql_placeholder_ex($tmpl, $args, &$errormsg)
 	{ 
 		// Запрос уже разобран?.. Если нет, разбираем. 
@@ -392,8 +395,11 @@ class Database
 			$errormsg = false; 
 			return $out; 
 		} 
-	} 
+	}
 
+    /**
+     * @param $filename
+     */
 	public function dump($filename)
 	{
 		$h = fopen($filename, 'w');
@@ -406,7 +412,10 @@ class Database
 		}
 	    fclose($h);
 	}
-	
+
+    /**
+     * @param $filename
+     */
 	function restore($filename)
 	{
 		$templine = '';
@@ -436,8 +445,11 @@ class Database
 		}
 		fclose($h);
 	}
-	
-	
+
+    /**
+     * @param $table
+     * @param $h
+     */
 	private function dump_table($table, $h)
 	{
 		$sql = "SELECT * FROM `$table`;";

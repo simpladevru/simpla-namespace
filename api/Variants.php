@@ -13,13 +13,6 @@ namespace Root\api;
 
 class Variants
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Simpla::$app->db;
-    }
-
     /**
 	* Функция возвращает варианты товара
 	* @param	$filter
@@ -32,22 +25,22 @@ class Variants
 		$instock_filter = '';
 		
 		if(!empty($filter['product_id'])) {
-			$product_id_filter = $this->db->placehold('AND v.product_id in(?@)', (array)$filter['product_id']);
+			$product_id_filter = db()->placehold('AND v.product_id in(?@)', (array)$filter['product_id']);
         }
 		
 		if(!empty($filter['id'])) {
-			$variant_id_filter = $this->db->placehold('AND v.id in(?@)', (array)$filter['id']);
+			$variant_id_filter = db()->placehold('AND v.id in(?@)', (array)$filter['id']);
         }
 
 		if(!empty($filter['in_stock']) && $filter['in_stock']) {
-			$instock_filter = $this->db->placehold('AND (v.stock>0 OR v.stock IS NULL)');
+			$instock_filter = db()->placehold('AND (v.stock>0 OR v.stock IS NULL)');
         }
 
 		if(!$product_id_filter && !$variant_id_filter) {
 			return array();
         }
 
-		$query = $this->db->placehold("SELECT v.id, v.product_id , v.price, NULLIF(v.compare_price, 0) as compare_price, v.sku, IFNULL(v.stock, ?) as stock, (v.stock IS NULL) as infinity, v.name, v.attachment, v.position
+		$query = db()->placehold("SELECT v.id, v.product_id , v.price, NULLIF(v.compare_price, 0) as compare_price, v.sku, IFNULL(v.stock, ?) as stock, (v.stock IS NULL) as infinity, v.name, v.attachment, v.position
 					FROM __variants AS v
 					WHERE 
 					1
@@ -57,8 +50,8 @@ class Variants
 					ORDER BY v.position       
 					", Simpla::$app->settings->max_order_amount);
 
-		$this->db->query($query);	
-		return $this->db->results();
+		db()->query($query);	
+		return db()->results();
 	}
 	
 	
@@ -68,27 +61,27 @@ class Variants
 			return false;
         }
 			
-		$query = $this->db->placehold("SELECT v.id, v.product_id , v.price, NULLIF(v.compare_price, 0) as compare_price, v.sku, IFNULL(v.stock, ?) as stock, (v.stock IS NULL) as infinity, v.name, v.attachment
+		$query = db()->placehold("SELECT v.id, v.product_id , v.price, NULLIF(v.compare_price, 0) as compare_price, v.sku, IFNULL(v.stock, ?) as stock, (v.stock IS NULL) as infinity, v.name, v.attachment
 					FROM __variants v WHERE v.id=?
 					LIMIT 1", settings()->max_order_amount, $id);
 		
-		$this->db->query($query);	
-		$variant = $this->db->result();
+		db()->query($query);	
+		$variant = db()->result();
 		return $variant;
 	}
 	
 	public function update_variant($id, $variant)
 	{
-		$query = $this->db->placehold("UPDATE __variants SET ?% WHERE id=? LIMIT 1", $variant, intval($id));
-		$this->db->query($query);
+		$query = db()->placehold("UPDATE __variants SET ?% WHERE id=? LIMIT 1", $variant, intval($id));
+		db()->query($query);
 		return $id;
 	}
 	
 	public function add_variant($variant)
 	{
-		$query = $this->db->placehold("INSERT INTO __variants SET ?%", $variant);
-		$this->db->query($query);
-		return $this->db->insert_id();
+		$query = db()->placehold("INSERT INTO __variants SET ?%", $variant);
+		db()->query($query);
+		return db()->insert_id();
 	}
 
 	public function delete_variant($id)
@@ -96,19 +89,19 @@ class Variants
 		if(!empty($id))
 		{
 			$this->delete_attachment($id);
-			$query = $this->db->placehold("DELETE FROM __variants WHERE id = ? LIMIT 1", intval($id));
-			$this->db->query($query);
+			$query = db()->placehold("DELETE FROM __variants WHERE id = ? LIMIT 1", intval($id));
+			db()->query($query);
 		}
 	}
 	
 	public function delete_attachment($id)
 	{
-		$query = $this->db->placehold("SELECT attachment FROM __variants WHERE id=?", $id);
-		$this->db->query($query);
-		$filename = $this->db->result('attachment');
-		$query = $this->db->placehold("SELECT 1 FROM __variants WHERE attachment=? AND id!=?", $filename, $id);
-		$this->db->query($query);
-		$exists = $this->db->num_rows();
+		$query = db()->placehold("SELECT attachment FROM __variants WHERE id=?", $id);
+		db()->query($query);
+		$filename = db()->result('attachment');
+		$query = db()->placehold("SELECT 1 FROM __variants WHERE attachment=? AND id!=?", $filename, $id);
+		db()->query($query);
+		$exists = db()->num_rows();
 		if(!empty($filename) && $exists == 0) {
 			@unlink($this->config->root_dir.'/'.$this->config->downloads_dir.$filename);
         }

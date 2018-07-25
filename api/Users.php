@@ -13,13 +13,6 @@ namespace Root\api;
 
 class Users
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Simpla::$app->db;
-    }
-
 	// осторожно, при изменении соли испортятся текущие пароли пользователей
 	private $salt = '8e86a279d6e182b3c811c559e6b15484';	
 	
@@ -37,13 +30,13 @@ class Users
 			$page = max(1, intval($filter['page']));
 
 		if(isset($filter['group_id']))
-			$group_id_filter = $this->db->placehold('AND u.group_id in(?@)', (array)$filter['group_id']);
+			$group_id_filter = db()->placehold('AND u.group_id in(?@)', (array)$filter['group_id']);
 		
 		if(isset($filter['keyword']))
 		{
 			$keywords = explode(' ', $filter['keyword']);
 			foreach($keywords as $keyword)
-				$keyword_filter .= $this->db->placehold('AND (u.name LIKE "%'.$this->db->escape(trim($keyword)).'%" OR u.email LIKE "%'.$this->db->escape(trim($keyword)).'%"  OR u.last_ip LIKE "%'.$this->db->escape(trim($keyword)).'%")');
+				$keyword_filter .= db()->placehold('AND (u.name LIKE "%'.db()->escape(trim($keyword)).'%" OR u.email LIKE "%'.db()->escape(trim($keyword)).'%"  OR u.last_ip LIKE "%'.db()->escape(trim($keyword)).'%")');
 		}
 		
 		$order = 'u.name';
@@ -59,13 +52,13 @@ class Users
 			}
 		
 
-		$sql_limit = $this->db->placehold(' LIMIT ?, ? ', ($page-1)*$limit, $limit);
+		$sql_limit = db()->placehold(' LIMIT ?, ? ', ($page-1)*$limit, $limit);
 		// Выбираем пользователей
-		$query = $this->db->placehold("SELECT u.id, u.email, u.password, u.name, u.group_id, u.enabled, u.last_ip, u.created, g.discount, g.name as group_name FROM __users u
+		$query = db()->placehold("SELECT u.id, u.email, u.password, u.name, u.group_id, u.enabled, u.last_ip, u.created, g.discount, g.name as group_name FROM __users u
 		                                LEFT JOIN __groups g ON u.group_id=g.id 
 										WHERE 1 $group_id_filter $keyword_filter ORDER BY $order $sql_limit");
-		$this->db->query($query);
-		return $this->db->results();
+		db()->query($query);
+		return db()->results();
 	}
 		
 	function count_users($filter = array())
@@ -74,34 +67,34 @@ class Users
 		$keyword_filter = '';
 
 		if(isset($filter['group_id']))
-			$group_id_filter = $this->db->placehold('AND u.group_id in(?@)', (array)$filter['group_id']);
+			$group_id_filter = db()->placehold('AND u.group_id in(?@)', (array)$filter['group_id']);
 		
 		if(isset($filter['keyword']))
 		{
 			$keywords = explode(' ', $filter['keyword']);
 			foreach($keywords as $keyword)
-				$keyword_filter .= $this->db->placehold('AND u.name LIKE "%'.$this->db->escape(trim($keyword)).'%" OR u.email LIKE "%'.$this->db->escape(trim($keyword)).'%"');
+				$keyword_filter .= db()->placehold('AND u.name LIKE "%'.db()->escape(trim($keyword)).'%" OR u.email LIKE "%'.db()->escape(trim($keyword)).'%"');
 		}
 
 		// Выбираем пользователей
-		$query = $this->db->placehold("SELECT count(*) as count FROM __users u
+		$query = db()->placehold("SELECT count(*) as count FROM __users u
 		                                LEFT JOIN __groups g ON u.group_id=g.id 
 										WHERE 1 $group_id_filter $keyword_filter");
-		$this->db->query($query);
-		return $this->db->result('count');
+		db()->query($query);
+		return db()->result('count');
 	}
 		
 	function get_user($id)
 	{
 		if(gettype($id) == 'string')
-			$where = $this->db->placehold(' WHERE u.email=? ', $id);
+			$where = db()->placehold(' WHERE u.email=? ', $id);
 		else
-			$where = $this->db->placehold(' WHERE u.id=? ', intval($id));
+			$where = db()->placehold(' WHERE u.id=? ', intval($id));
 	
 		// Выбираем пользователя
-		$query = $this->db->placehold("SELECT u.id, u.email, u.password, u.name, u.group_id, u.enabled, u.last_ip, u.created, g.discount, g.name as group_name FROM __users u LEFT JOIN __groups g ON u.group_id=g.id $where LIMIT 1", $id);
-		$this->db->query($query);
-		$user = $this->db->result();
+		$query = db()->placehold("SELECT u.id, u.email, u.password, u.name, u.group_id, u.enabled, u.last_ip, u.created, g.discount, g.name as group_name FROM __users u LEFT JOIN __groups g ON u.group_id=g.id $where LIMIT 1", $id);
+		db()->query($query);
+		$user = db()->result();
 		if(empty($user))
 			return false;
 		$user->discount *= 1; // Убираем лишние нули, чтобы было 5 вместо 5.00
@@ -114,15 +107,15 @@ class Users
 		if(isset($user['password']))
 			$user['password'] = md5($this->salt.$user['password'].md5($user['password']));
 			
-		$query = $this->db->placehold("SELECT count(*) as count FROM __users WHERE email=?", $user['email']);
-		$this->db->query($query);
+		$query = db()->placehold("SELECT count(*) as count FROM __users WHERE email=?", $user['email']);
+		db()->query($query);
 		
-		if($this->db->result('count') > 0)
+		if(db()->result('count') > 0)
 			return false;
 		
-		$query = $this->db->placehold("INSERT INTO __users SET ?%", $user);
-		$this->db->query($query);
-		return $this->db->insert_id();
+		$query = db()->placehold("INSERT INTO __users SET ?%", $user);
+		db()->query($query);
+		return db()->insert_id();
 	}
 		
 	public function update_user($id, $user)
@@ -130,8 +123,8 @@ class Users
 		$user = (array)$user;
 		if(isset($user['password']))
 			$user['password'] = md5($this->salt.$user['password'].md5($user['password']));
-		$query = $this->db->placehold("UPDATE __users SET ?% WHERE id=? LIMIT 1", $user, intval($id));
-		$this->db->query($query);
+		$query = db()->placehold("UPDATE __users SET ?% WHERE id=? LIMIT 1", $user, intval($id));
+		db()->query($query);
 		return $id;
 	}
 	
@@ -145,11 +138,11 @@ class Users
 	{
 		if(!empty($id))
 		{
-			$query = $this->db->placehold("UPDATE __orders SET user_id=NULL WHERE id=? LIMIT 1", intval($id));
-			$this->db->query($query);
+			$query = db()->placehold("UPDATE __orders SET user_id=NULL WHERE id=? LIMIT 1", intval($id));
+			db()->query($query);
 			
-			$query = $this->db->placehold("DELETE FROM __users WHERE id=? LIMIT 1", intval($id));
-			if($this->db->query($query))
+			$query = db()->placehold("DELETE FROM __users WHERE id=? LIMIT 1", intval($id));
+			if(db()->query($query))
 				return true;
 		}
 		return false;
@@ -158,17 +151,17 @@ class Users
 	function get_groups()
 	{
 		// Выбираем группы
-		$query = $this->db->placehold("SELECT g.id, g.name, g.discount FROM __groups AS g ORDER BY g.discount");
-		$this->db->query($query);
-		return $this->db->results();
+		$query = db()->placehold("SELECT g.id, g.name, g.discount FROM __groups AS g ORDER BY g.discount");
+		db()->query($query);
+		return db()->results();
 	}	
 	
 	function get_group($id)
 	{
 		// Выбираем группу
-		$query = $this->db->placehold("SELECT * FROM __groups WHERE id=? LIMIT 1", $id);
-		$this->db->query($query);
-		$group = $this->db->result();
+		$query = db()->placehold("SELECT * FROM __groups WHERE id=? LIMIT 1", $id);
+		db()->query($query);
+		$group = db()->result();
 
 		return $group;
 	}	
@@ -176,15 +169,15 @@ class Users
 	
 	public function add_group($group)
 	{
-		$query = $this->db->placehold("INSERT INTO __groups SET ?%", $group);
-		$this->db->query($query);
-		return $this->db->insert_id();
+		$query = db()->placehold("INSERT INTO __groups SET ?%", $group);
+		db()->query($query);
+		return db()->insert_id();
 	}
 		
 	public function update_group($id, $group)
 	{
-		$query = $this->db->placehold("UPDATE __groups SET ?% WHERE id=? LIMIT 1", $group, intval($id));
-		$this->db->query($query);
+		$query = db()->placehold("UPDATE __groups SET ?% WHERE id=? LIMIT 1", $group, intval($id));
+		db()->query($query);
 		return $id;
 	}
 	
@@ -192,11 +185,11 @@ class Users
 	{
 		if(!empty($id))
 		{
-			$query = $this->db->placehold("UPDATE __users SET group_id=NULL WHERE group_id=? LIMIT 1", intval($id));
-			$this->db->query($query);
+			$query = db()->placehold("UPDATE __users SET group_id=NULL WHERE group_id=? LIMIT 1", intval($id));
+			db()->query($query);
 			
-			$query = $this->db->placehold("DELETE FROM __groups WHERE id=? LIMIT 1", intval($id));
-			if($this->db->query($query))
+			$query = db()->placehold("DELETE FROM __groups WHERE id=? LIMIT 1", intval($id));
+			if(db()->query($query))
 				return true;
 		}
 		return false;
@@ -205,9 +198,9 @@ class Users
 	public function check_password($email, $password)
 	{
 		$encpassword = md5($this->salt.$password.md5($password));
-		$query = $this->db->placehold("SELECT id FROM __users WHERE email=? AND password=? LIMIT 1", $email, $encpassword);
-		$this->db->query($query);
-		if($id = $this->db->result('id'))
+		$query = db()->placehold("SELECT id FROM __users WHERE email=? AND password=? LIMIT 1", $email, $encpassword);
+		db()->query($query);
+		if($id = db()->result('id'))
 			return $id;
 		return false;
 	}

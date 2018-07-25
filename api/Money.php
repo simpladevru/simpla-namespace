@@ -16,12 +16,8 @@ class Money
 	private $currencies = array();
 	private $currency;
 
-	private $db;
-
 	public function __construct()
 	{
-	    $this->db = Simpla::$app->db;
-
 		if(isset($this->settings->price_decimals_point)) {
 			$this->decimals_point = $this->settings->price_decimals_point;
         }
@@ -40,9 +36,9 @@ class Money
 		$this->currencies = array();
 		// Выбираем из базы валюты
 		$query = "SELECT id, name, sign, code, rate_from, rate_to, cents, position, enabled FROM __currencies ORDER BY position";
-		$this->db->query($query);
+		db()->query($query);
 		
-		$results = $this->db->results();
+		$results = db()->results();
 		
 		foreach($results as $c) {
 			$this->currencies[$c->id] = $c;
@@ -83,14 +79,14 @@ class Money
 	
 	public function add_currency($currency)
 	{	
-		$query = $this->db->placehold('INSERT INTO __currenciesSET ?%', $currency);
+		$query = db()->placehold('INSERT INTO __currenciesSET ?%', $currency);
 
-		if(!$this->db->query($query)) {
+		if(!db()->query($query)) {
 			return false;
         }
 
-		$id = $this->db->insert_id();
-		$this->db->query("UPDATE __currencies SET position=id WHERE id=?", $id);
+		$id = db()->insert_id();
+		db()->query("UPDATE __currencies SET position=id WHERE id=?", $id);
 		$this->init_currencies();
 			
 		return $id;
@@ -98,11 +94,11 @@ class Money
 	
 	public function update_currency($id, $currency)
 	{	
-		$query = $this->db->placehold('UPDATE __currencies
+		$query = db()->placehold('UPDATE __currencies
 						SET ?%
 						WHERE id in (?@)',
 					$currency, (array)$id);
-		if(!$this->db->query($query)) {
+		if(!db()->query($query)) {
 			return false;
         }
 		
@@ -113,8 +109,8 @@ class Money
 	public function delete_currency($id)
 	{
 		if(!empty($id)) {
-			$query = $this->db->placehold("DELETE FROM __currencies WHERE id=? LIMIT 1", intval($id));
-			$this->db->query($query);
+			$query = db()->placehold("DELETE FROM __currencies WHERE id=? LIMIT 1", intval($id));
+			db()->query($query);
 		}
 		$this->init_currencies();		
 	}	

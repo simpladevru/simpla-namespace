@@ -1,6 +1,7 @@
 <?php
 
 require __DIR__.'/../vendor/autoload.php';
+
 $simpla = new Root\api\Simpla();
 
 if( !function_exists('simpla') )

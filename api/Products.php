@@ -13,13 +13,6 @@ namespace Root\api;
 
 class Products
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Simpla::$app->db;
-    }
-
 	/**
 	* Функция возвращает товары
 	* Возможные значения фильтра:
@@ -55,31 +48,31 @@ class Products
 		if(isset($filter['page']))
 			$page = max(1, intval($filter['page']));
 
-		$sql_limit = $this->db->placehold(' LIMIT ?, ? ', ($page-1)*$limit, $limit);
+		$sql_limit = db()->placehold(' LIMIT ?, ? ', ($page-1)*$limit, $limit);
 
 		if(!empty($filter['id']))
-			$product_id_filter = $this->db->placehold('AND p.id in(?@)', (array)$filter['id']);
+			$product_id_filter = db()->placehold('AND p.id in(?@)', (array)$filter['id']);
 
 		if(!empty($filter['category_id']))
 		{
-			$category_id_filter = $this->db->placehold('INNER JOIN __products_categories pc ON pc.product_id = p.id AND pc.category_id in(?@)', (array)$filter['category_id']);
+			$category_id_filter = db()->placehold('INNER JOIN __products_categories pc ON pc.product_id = p.id AND pc.category_id in(?@)', (array)$filter['category_id']);
 			$group_by = "GROUP BY p.id";
 		}
 
 		if(!empty($filter['brand_id']))
-			$brand_id_filter = $this->db->placehold('AND p.brand_id in(?@)', (array)$filter['brand_id']);
+			$brand_id_filter = db()->placehold('AND p.brand_id in(?@)', (array)$filter['brand_id']);
 
 		if(isset($filter['featured']))
-			$is_featured_filter = $this->db->placehold('AND p.featured=?', intval($filter['featured']));
+			$is_featured_filter = db()->placehold('AND p.featured=?', intval($filter['featured']));
 
 		if(isset($filter['discounted']))
-			$discounted_filter = $this->db->placehold('AND (SELECT 1 FROM __variants pv WHERE pv.product_id=p.id AND pv.compare_price>0 LIMIT 1) = ?', intval($filter['discounted']));
+			$discounted_filter = db()->placehold('AND (SELECT 1 FROM __variants pv WHERE pv.product_id=p.id AND pv.compare_price>0 LIMIT 1) = ?', intval($filter['discounted']));
 
 		if(isset($filter['in_stock']))
-			$in_stock_filter = $this->db->placehold('AND (SELECT count(*)>0 FROM __variants pv WHERE pv.product_id=p.id AND pv.price>0 AND (pv.stock IS NULL OR pv.stock>0) LIMIT 1) = ?', intval($filter['in_stock']));
+			$in_stock_filter = db()->placehold('AND (SELECT count(*)>0 FROM __variants pv WHERE pv.product_id=p.id AND pv.price>0 AND (pv.stock IS NULL OR pv.stock>0) LIMIT 1) = ?', intval($filter['in_stock']));
 
 		if(isset($filter['visible']))
-			$visible_filter = $this->db->placehold('AND p.visible=?', intval($filter['visible']));
+			$visible_filter = db()->placehold('AND p.visible=?', intval($filter['visible']));
 
  		if(!empty($filter['sort']))
 			switch ($filter['sort'])
@@ -104,15 +97,15 @@ class Products
 			$keywords = explode(' ', $filter['keyword']);
 			foreach($keywords as $keyword)
 			{
-				$kw = $this->db->escape(trim($keyword));
+				$kw = db()->escape(trim($keyword));
 				if($kw!=='')
-					$keyword_filter .= $this->db->placehold("AND (p.name LIKE '%$kw%' OR p.meta_keywords LIKE '%$kw%' OR p.id in (SELECT product_id FROM __variants WHERE sku LIKE '%$kw%'))");
+					$keyword_filter .= db()->placehold("AND (p.name LIKE '%$kw%' OR p.meta_keywords LIKE '%$kw%' OR p.id in (SELECT product_id FROM __variants WHERE sku LIKE '%$kw%'))");
 			}
 		}
 
 		if(!empty($filter['features']) && !empty($filter['features']))
 			foreach($filter['features'] as $feature=>$value)
-				$features_filter .= $this->db->placehold('AND p.id in (SELECT product_id FROM __options WHERE feature_id=? AND value=? ) ', $feature, $value);
+				$features_filter .= db()->placehold('AND p.id in (SELECT product_id FROM __options WHERE feature_id=? AND value=? ) ', $feature, $value);
 
 		$query = "SELECT  
 					p.id,
@@ -147,9 +140,9 @@ class Products
 				ORDER BY $order
 					$sql_limit";
 
-		$this->db->query($query);
+		db()->query($query);
 
-		return $this->db->results();
+		return db()->results();
 	}
 
 	/**
@@ -173,41 +166,41 @@ class Products
 		$features_filter = '';
 		
 		if(!empty($filter['category_id']))
-			$category_id_filter = $this->db->placehold('INNER JOIN __products_categories pc ON pc.product_id = p.id AND pc.category_id in(?@)', (array)$filter['category_id']);
+			$category_id_filter = db()->placehold('INNER JOIN __products_categories pc ON pc.product_id = p.id AND pc.category_id in(?@)', (array)$filter['category_id']);
 
 		if(!empty($filter['brand_id']))
-			$brand_id_filter = $this->db->placehold('AND p.brand_id in(?@)', (array)$filter['brand_id']);
+			$brand_id_filter = db()->placehold('AND p.brand_id in(?@)', (array)$filter['brand_id']);
 
 		if(!empty($filter['id']))
-			$product_id_filter = $this->db->placehold('AND p.id in(?@)', (array)$filter['id']);
+			$product_id_filter = db()->placehold('AND p.id in(?@)', (array)$filter['id']);
 		
 		if(isset($filter['keyword']))
 		{
 			$keywords = explode(' ', $filter['keyword']);
 			foreach($keywords as $keyword)
 			{
-				$kw = $this->db->escape(trim($keyword));
+				$kw = db()->escape(trim($keyword));
 				if($kw!=='')
-					$keyword_filter .= $this->db->placehold("AND (p.name LIKE '%$kw%' OR p.meta_keywords LIKE '%$kw%' OR p.id in (SELECT product_id FROM __variants WHERE sku LIKE '%$kw%'))");
+					$keyword_filter .= db()->placehold("AND (p.name LIKE '%$kw%' OR p.meta_keywords LIKE '%$kw%' OR p.id in (SELECT product_id FROM __variants WHERE sku LIKE '%$kw%'))");
 			}
 		}
 
 		if(isset($filter['featured']))
-			$is_featured_filter = $this->db->placehold('AND p.featured=?', intval($filter['featured']));
+			$is_featured_filter = db()->placehold('AND p.featured=?', intval($filter['featured']));
 
 		if(isset($filter['in_stock']))
-			$in_stock_filter = $this->db->placehold('AND (SELECT count(*)>0 FROM __variants pv WHERE pv.product_id=p.id AND pv.price>0 AND (pv.stock IS NULL OR pv.stock>0) LIMIT 1) = ?', intval($filter['in_stock']));
+			$in_stock_filter = db()->placehold('AND (SELECT count(*)>0 FROM __variants pv WHERE pv.product_id=p.id AND pv.price>0 AND (pv.stock IS NULL OR pv.stock>0) LIMIT 1) = ?', intval($filter['in_stock']));
 
 		if(isset($filter['discounted']))
-			$discounted_filter = $this->db->placehold('AND (SELECT 1 FROM __variants pv WHERE pv.product_id=p.id AND pv.compare_price>0 LIMIT 1) = ?', intval($filter['discounted']));
+			$discounted_filter = db()->placehold('AND (SELECT 1 FROM __variants pv WHERE pv.product_id=p.id AND pv.compare_price>0 LIMIT 1) = ?', intval($filter['discounted']));
 
 		if(isset($filter['visible']))
-			$visible_filter = $this->db->placehold('AND p.visible=?', intval($filter['visible']));
+			$visible_filter = db()->placehold('AND p.visible=?', intval($filter['visible']));
 		
 		
 		if(!empty($filter['features']) && !empty($filter['features']))
 			foreach($filter['features'] as $feature=>$value)
-				$features_filter .= $this->db->placehold('AND p.id in (SELECT product_id FROM __options WHERE feature_id=? AND value=? ) ', $feature, $value);
+				$features_filter .= db()->placehold('AND p.id in (SELECT product_id FROM __options WHERE feature_id=? AND value=? ) ', $feature, $value);
 		
 		$query = "SELECT count(distinct p.id) as count
 				FROM __products AS p
@@ -222,8 +215,8 @@ class Products
 					$visible_filter
 					$features_filter ";
 
-		$this->db->query($query);	
-		return $this->db->result('count');
+		db()->query($query);	
+		return db()->result('count');
 	}
 
 
@@ -235,9 +228,9 @@ class Products
 	public function get_product($id)
 	{
 		if(is_int($id))
-			$filter = $this->db->placehold('p.id = ?', $id);
+			$filter = db()->placehold('p.id = ?', $id);
 		else
-			$filter = $this->db->placehold('p.url = ?', $id);
+			$filter = db()->placehold('p.url = ?', $id);
 			
 		$query = "SELECT DISTINCT
 					p.id,
@@ -257,15 +250,15 @@ class Products
                 WHERE $filter
                 GROUP BY p.id
                 LIMIT 1";
-		$this->db->query($query);
-		$product = $this->db->result();
+		db()->query($query);
+		$product = db()->result();
 		return $product;
 	}
 
 	public function update_product($id, $product)
 	{
-		$query = $this->db->placehold("UPDATE __products SET ?% WHERE id in (?@) LIMIT ?", $product, (array)$id, count((array)$id));
-		if($this->db->query($query))
+		$query = db()->placehold("UPDATE __products SET ?% WHERE id in (?@) LIMIT ?", $product, (array)$id, count((array)$id));
+		if(db()->query($query))
 			return $id;
 		else
 			return false;
@@ -290,10 +283,10 @@ class Products
 				$product['url'] = $product['url'].'_2';
 		}
 
-		if($this->db->query("INSERT INTO __products SET ?%", $product))
+		if(db()->query("INSERT INTO __products SET ?%", $product))
 		{
-			$id = $this->db->insert_id();
-			$this->db->query("UPDATE __products SET position=id WHERE id=?", $id);		
+			$id = db()->insert_id();
+			db()->query("UPDATE __products SET position=id WHERE id=?", $id);		
 			return $id;
 		}
 		else
@@ -329,8 +322,8 @@ class Products
             }
 
 			// Удаляем товар
-			$query = $this->db->placehold("DELETE FROM __products WHERE id=? LIMIT 1", intval($id));
-			if($this->db->query($query)) {
+			$query = db()->placehold("DELETE FROM __products WHERE id=? LIMIT 1", intval($id));
+			if(db()->query($query)) {
 				return true;
             }
 		}
@@ -345,12 +338,12 @@ class Products
     	$product->created = null;
 
 		// Сдвигаем товары вперед и вставляем копию на соседнюю позицию
-    	$this->db->query('UPDATE __products SET position=position+1 WHERE position>?', $product->position);
+    	db()->query('UPDATE __products SET position=position+1 WHERE position>?', $product->position);
     	$new_id = $this->products->add_product($product);
-    	$this->db->query('UPDATE __products SET position=? WHERE id=?', $product->position+1, $new_id);
+    	db()->query('UPDATE __products SET position=? WHERE id=?', $product->position+1, $new_id);
     	
     	// Очищаем url
-    	$this->db->query('UPDATE __products SET url="" WHERE id=?', $new_id);
+    	db()->query('UPDATE __products SET url="" WHERE id=?', $new_id);
     	
 		// Дублируем категории
 		$categories = $this->categories->get_product_categories($id);
@@ -395,9 +388,9 @@ class Products
 		if(empty($product_id))
 			return array();
 
-		$product_id_filter = $this->db->placehold('AND product_id in(?@)', (array)$product_id);
+		$product_id_filter = db()->placehold('AND product_id in(?@)', (array)$product_id);
 				
-		$query = $this->db->placehold("SELECT product_id, related_id, position
+		$query = db()->placehold("SELECT product_id, related_id, position
 					FROM __related_products
 					WHERE 
 					1
@@ -405,23 +398,23 @@ class Products
 					ORDER BY position       
 					");
 		
-		$this->db->query($query);
-		return $this->db->results();
+		db()->query($query);
+		return db()->results();
 	}
 	
 	// Функция возвращает связанные товары
 	public function add_related_product($product_id, $related_id, $position=0)
 	{
-		$query = $this->db->placehold("INSERT IGNORE INTO __related_products SET product_id=?, related_id=?, position=?", $product_id, $related_id, $position);
-		$this->db->query($query);
+		$query = db()->placehold("INSERT IGNORE INTO __related_products SET product_id=?, related_id=?, position=?", $product_id, $related_id, $position);
+		db()->query($query);
 		return $related_id;
 	}
 	
 	// Удаление связанного товара
 	public function delete_related_product($product_id, $related_id)
 	{
-		$query = $this->db->placehold("DELETE FROM __related_products WHERE product_id=? AND related_id=? LIMIT 1", intval($product_id), intval($related_id));
-		$this->db->query($query);
+		$query = db()->placehold("DELETE FROM __related_products WHERE product_id=? AND related_id=? LIMIT 1", intval($product_id), intval($related_id));
+		db()->query($query);
 	}
 	
 	
@@ -431,27 +424,27 @@ class Products
 		$group_by = '';
 
 		if(!empty($filter['product_id']))
-			$product_id_filter = $this->db->placehold('AND i.product_id in(?@)', (array)$filter['product_id']);
+			$product_id_filter = db()->placehold('AND i.product_id in(?@)', (array)$filter['product_id']);
 
 		// images
-		$query = $this->db->placehold("SELECT i.id, i.product_id, i.name, i.filename, i.position
+		$query = db()->placehold("SELECT i.id, i.product_id, i.name, i.filename, i.position
 									FROM __images AS i WHERE 1 $product_id_filter $group_by ORDER BY i.product_id, i.position");
-		$this->db->query($query);
-		return $this->db->results();
+		db()->query($query);
+		return db()->results();
 	}
 	
 	public function add_image($product_id, $filename, $name = '')
 	{
-		$query = $this->db->placehold("SELECT id FROM __images WHERE product_id=? AND filename=?", $product_id, $filename);
-		$this->db->query($query);
-		$id = $this->db->result('id');
+		$query = db()->placehold("SELECT id FROM __images WHERE product_id=? AND filename=?", $product_id, $filename);
+		db()->query($query);
+		$id = db()->result('id');
 		if(empty($id))
 		{
-			$query = $this->db->placehold("INSERT INTO __images SET product_id=?, filename=?", $product_id, $filename);
-			$this->db->query($query);
-			$id = $this->db->insert_id();
-			$query = $this->db->placehold("UPDATE __images SET position=id WHERE id=?", $id);
-			$this->db->query($query);
+			$query = db()->placehold("INSERT INTO __images SET product_id=?, filename=?", $product_id, $filename);
+			db()->query($query);
+			$id = db()->insert_id();
+			$query = db()->placehold("UPDATE __images SET position=id WHERE id=?", $id);
+			db()->query($query);
 		}
 		return($id);
 	}
@@ -459,22 +452,22 @@ class Products
 	public function update_image($id, $image)
 	{
 	
-		$query = $this->db->placehold("UPDATE __images SET ?% WHERE id=?", $image, $id);
-		$this->db->query($query);
+		$query = db()->placehold("UPDATE __images SET ?% WHERE id=?", $image, $id);
+		db()->query($query);
 		
 		return($id);
 	}
 	
 	public function delete_image($id)
 	{
-		$query = $this->db->placehold("SELECT filename FROM __images WHERE id=?", $id);
-		$this->db->query($query);
-		$filename = $this->db->result('filename');
-		$query = $this->db->placehold("DELETE FROM __images WHERE id=? LIMIT 1", $id);
-		$this->db->query($query);
-		$query = $this->db->placehold("SELECT count(*) as count FROM __images WHERE filename=? LIMIT 1", $filename);
-		$this->db->query($query);
-		$count = $this->db->result('count');
+		$query = db()->placehold("SELECT filename FROM __images WHERE id=?", $id);
+		db()->query($query);
+		$filename = db()->result('filename');
+		$query = db()->placehold("DELETE FROM __images WHERE id=? LIMIT 1", $id);
+		db()->query($query);
+		$query = db()->placehold("SELECT count(*) as count FROM __images WHERE filename=? LIMIT 1", $filename);
+		db()->query($query);
+		$count = db()->result('count');
 		if($count == 0)
 		{			
 			$file = pathinfo($filename, PATHINFO_FILENAME);
@@ -497,20 +490,20 @@ class Products
 	*/	
 	public function get_next_product($id)
 	{
-		$this->db->query("SELECT position FROM __products WHERE id=? LIMIT 1", $id);
-		$position = $this->db->result('position');
+		db()->query("SELECT position FROM __products WHERE id=? LIMIT 1", $id);
+		$position = db()->result('position');
 		
-		$this->db->query("SELECT pc.category_id FROM __products_categories pc WHERE product_id=? ORDER BY position LIMIT 1", $id);
-		$category_id = $this->db->result('category_id');
+		db()->query("SELECT pc.category_id FROM __products_categories pc WHERE product_id=? ORDER BY position LIMIT 1", $id);
+		$category_id = db()->result('category_id');
 
-		$query = $this->db->placehold("SELECT id FROM __products p, __products_categories pc
+		$query = db()->placehold("SELECT id FROM __products p, __products_categories pc
 										WHERE pc.product_id=p.id AND p.position>? 
 										AND pc.position=(SELECT MIN(pc2.position) FROM __products_categories pc2 WHERE pc.product_id=pc2.product_id)
 										AND pc.category_id=? 
 										AND p.visible ORDER BY p.position limit 1", $position, $category_id);
-		$this->db->query($query);
+		db()->query($query);
  
-		return $this->get_product((integer)$this->db->result('id'));
+		return $this->get_product((integer)db()->result('id'));
 	}
 	
 	/*
@@ -520,20 +513,20 @@ class Products
 	*/	
 	public function get_prev_product($id)
 	{
-		$this->db->query("SELECT position FROM __products WHERE id=? LIMIT 1", $id);
-		$position = $this->db->result('position');
+		db()->query("SELECT position FROM __products WHERE id=? LIMIT 1", $id);
+		$position = db()->result('position');
 		
-		$this->db->query("SELECT pc.category_id FROM __products_categories pc WHERE product_id=? ORDER BY position LIMIT 1", $id);
-		$category_id = $this->db->result('category_id');
+		db()->query("SELECT pc.category_id FROM __products_categories pc WHERE product_id=? ORDER BY position LIMIT 1", $id);
+		$category_id = db()->result('category_id');
 
-		$query = $this->db->placehold("SELECT id FROM __products p, __products_categories pc
+		$query = db()->placehold("SELECT id FROM __products p, __products_categories pc
 										WHERE pc.product_id=p.id AND p.position<? 
 										AND pc.position=(SELECT MIN(pc2.position) FROM __products_categories pc2 WHERE pc.product_id=pc2.product_id)
 										AND pc.category_id=? 
 										AND p.visible ORDER BY p.position DESC limit 1", $position, $category_id);
-		$this->db->query($query);
+		db()->query($query);
  
-		return $this->get_product((integer)$this->db->result('id'));	}
+		return $this->get_product((integer)db()->result('id'));	}
 	
 		
 }

@@ -17,17 +17,13 @@ class Settings
 {
 	private $vars = array();
 
-    private $db;
-
 	function __construct()
 	{
-        $this->db = Simpla::$app->db;
-
 		// Выбираем из базы настройки
-		$this->db->query('SELECT name, value FROM __settings');
+		db()->query('SELECT name, value FROM __settings');
 
 		// и записываем их в переменную		
-		foreach($this->db->results() as $result) {
+		foreach(db()->results() as $result) {
 			if(!($this->vars[$result->name] = @unserialize($result->value))) {
 				$this->vars[$result->name] = $result->value;
             }
@@ -54,12 +50,12 @@ class Settings
 			$value = (string) $value;
         }
 			
-		$this->db->query('SELECT count(*) as count FROM __settings WHERE name=?', $name);
-		if($this->db->result('count')>0) {
-			$this->db->query('UPDATE __settings SET value=? WHERE name=?', $value, $name);
+		db()->query('SELECT count(*) as count FROM __settings WHERE name=?', $name);
+		if(db()->result('count')>0) {
+			db()->query('UPDATE __settings SET value=? WHERE name=?', $value, $name);
         }
 		else {
-			$this->db->query('INSERT INTO __settings SET value=?, name=?', $value, $name);
+			db()->query('INSERT INTO __settings SET value=?, name=?', $value, $name);
         }
 	}
 }

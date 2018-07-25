@@ -2,6 +2,8 @@
 
 namespace Root\api;
 
+use Root\helpers\Debug;
+
 /**
  * Класс-обертка для обращения к переменным _GET, _POST, _FILES
  *
@@ -13,9 +15,6 @@ namespace Root\api;
 
 class Request
 {
-	/**
-	 * Конструктор, чистка слешей
-	 */
 	public function __construct()
 	{
 		$_POST = $this->stripslashes_recursive($_POST);

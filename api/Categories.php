@@ -18,13 +18,6 @@ class Categories
 	// Дерево категорий
 	private $categories_tree;
 
-	private $db;
-
-	public function __construct()
-    {
-        $this->db = Simpla::$app->db;
-    }
-
     // Функция возвращает массив категорий
 	public function get_categories($filter = array())
 	{
@@ -33,9 +26,9 @@ class Categories
  
 		if(!empty($filter['product_id']))
 		{
-			$query = $this->db->placehold("SELECT category_id FROM __products_categories WHERE product_id in(?@) ORDER BY position", (array)$filter['product_id']);
-			$this->db->query($query);
-			$categories_ids = $this->db->results('category_id');
+			$query = db()->placehold("SELECT category_id FROM __products_categories WHERE product_id in(?@) ORDER BY position", (array)$filter['product_id']);
+			db()->query($query);
+			$categories_ids = db()->results('category_id');
 			$result = array();
 			foreach($categories_ids as $id)
 				if(isset($this->all_categories[$id]))
@@ -49,17 +42,17 @@ class Categories
 	// Функция возвращает id категорий для заданного товара
 	public function get_product_categories($product_id)
 	{
-		$query = $this->db->placehold("SELECT product_id, category_id, position FROM __products_categories WHERE product_id in(?@) ORDER BY position", (array)$product_id);
-		$this->db->query($query);
-		return $this->db->results();
+		$query = db()->placehold("SELECT product_id, category_id, position FROM __products_categories WHERE product_id in(?@) ORDER BY position", (array)$product_id);
+		db()->query($query);
+		return db()->results();
 	}	
 
 	// Функция возвращает id категорий для всех товаров
 	public function get_products_categories()
 	{
-		$query = $this->db->placehold("SELECT product_id, category_id, position FROM __products_categories ORDER BY position");
-		$this->db->query($query);
-		return $this->db->results();
+		$query = db()->placehold("SELECT product_id, category_id, position FROM __products_categories ORDER BY position");
+		db()->query($query);
+		return db()->results();
 	}	
 
 	// Функция возвращает дерево категорий
@@ -112,9 +105,9 @@ class Categories
             }
 		}
 
-		$this->db->query("INSERT INTO __categories SET ?%", $category);
-		$id = $this->db->insert_id();
-		$this->db->query("UPDATE __categories SET position=id WHERE id=?", $id);		
+		db()->query("INSERT INTO __categories SET ?%", $category);
+		$id = db()->insert_id();
+		db()->query("UPDATE __categories SET position=id WHERE id=?", $id);		
 		unset($this->categories_tree);	
 		unset($this->all_categories);	
 		return $id;
@@ -123,8 +116,8 @@ class Categories
 	// Изменение категории
 	public function update_category($id, $category)
 	{
-		$query = $this->db->placehold("UPDATE __categories SET ?% WHERE id=? LIMIT 1", $category, intval($id));
-		$this->db->query($query);
+		$query = db()->placehold("UPDATE __categories SET ?% WHERE id=? LIMIT 1", $category, intval($id));
+		db()->query($query);
 		unset($this->categories_tree);			
 		unset($this->all_categories);	
 		return intval($id);
@@ -137,8 +130,8 @@ class Categories
 		foreach($ids as $id) {
 			if($category = $this->get_category(intval($id))) {
                 $this->delete_image($category->children);
-                $query = $this->db->placehold("DELETE FROM __categories WHERE id in(?@)", $category->children);
-                $this->db->query($query);
+                $query = db()->placehold("DELETE FROM __categories WHERE id in(?@)", $category->children);
+                db()->query($query);
             }
 		}
 		unset($this->categories_tree);			
@@ -149,33 +142,33 @@ class Categories
 	// Добавить категорию к заданному товару
 	public function add_product_category($product_id, $category_id, $position=0)
 	{
-		$query = $this->db->placehold("INSERT IGNORE INTO __products_categories SET product_id=?, category_id=?, position=?", $product_id, $category_id, $position);
-		$this->db->query($query);
+		$query = db()->placehold("INSERT IGNORE INTO __products_categories SET product_id=?, category_id=?, position=?", $product_id, $category_id, $position);
+		db()->query($query);
 	}
 
 	// Удалить категорию заданного товара
 	public function delete_product_category($product_id, $category_id)
 	{
-		$query = $this->db->placehold("DELETE FROM __products_categories WHERE product_id=? AND category_id=? LIMIT 1", intval($product_id), intval($category_id));
-		$this->db->query($query);
+		$query = db()->placehold("DELETE FROM __products_categories WHERE product_id=? AND category_id=? LIMIT 1", intval($product_id), intval($category_id));
+		db()->query($query);
 	}
 	
 	// Удалить изображение категории
 	public function delete_image($categories_ids)
 	{
 		$categories_ids = (array) $categories_ids;
-		$query = $this->db->placehold("SELECT image FROM __categories WHERE id in(?@)", $categories_ids);
-		$this->db->query($query);
-		$filenames = $this->db->results('image');
+		$query = db()->placehold("SELECT image FROM __categories WHERE id in(?@)", $categories_ids);
+		db()->query($query);
+		$filenames = db()->results('image');
 		if(!empty($filenames))
 		{
-			$query = $this->db->placehold("UPDATE __categories SET image=NULL WHERE id in(?@)", $categories_ids);
-			$this->db->query($query);
+			$query = db()->placehold("UPDATE __categories SET image=NULL WHERE id in(?@)", $categories_ids);
+			db()->query($query);
 			foreach($filenames as $filename)
 			{
-				$query = $this->db->placehold("SELECT count(*) as count FROM __categories WHERE image=?", $filename);
-				$this->db->query($query);
-				$count = $this->db->result('count');
+				$query = db()->placehold("SELECT count(*) as count FROM __categories WHERE image=?", $filename);
+				db()->query($query);
+				$count = db()->result('count');
 				if($count == 0) {
 					@unlink($this->config->root_dir.$this->config->categories_images_dir.$filename);		
 				}
@@ -200,16 +193,16 @@ class Categories
 		$pointers[0]->level = 0;
 
 		// Выбираем все категории
-		$query = $this->db->placehold("SELECT c.id, IFNULL(c.parent_id, 0) as parent_id, c.name, c.description, c.url, c.meta_title, c.meta_keywords, c.meta_description, c.image, c.visible, c.position
+		$query = db()->placehold("SELECT c.id, IFNULL(c.parent_id, 0) as parent_id, c.name, c.description, c.url, c.meta_title, c.meta_keywords, c.meta_description, c.image, c.visible, c.position
 										FROM __categories c ORDER BY c.parent_id, c.position");
 
 		// Выбор категорий с подсчетом количества товаров для каждой. Может тормозить при большом количестве товаров.
-		// $query = $this->db->placehold("SELECT c.id, c.parent_id, c.name, c.description, c.url, c.meta_title, c.meta_keywords, c.meta_description, c.image, c.visible, c.position, COUNT(p.id) as products_count
+		// $query = db()->placehold("SELECT c.id, c.parent_id, c.name, c.description, c.url, c.meta_title, c.meta_keywords, c.meta_description, c.image, c.visible, c.position, COUNT(p.id) as products_count
 		//                               FROM __categories c LEFT JOIN __products_categories pc ON pc.category_id=c.id LEFT JOIN __products p ON p.id=pc.product_id AND p.visible GROUP BY c.id ORDER BY c.parent_id, c.position");
 		
 		
-		$this->db->query($query);
-		$categories = $this->db->results();
+		db()->query($query);
+		$categories = db()->results();
 
 		$finish = false;
 		// Не кончаем, пока не кончатся категории, или пока ниодну из оставшихся некуда приткнуть

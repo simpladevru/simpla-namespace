@@ -112,8 +112,8 @@ class Image
 	public function download_image($filename)
 	{
 		// Заливаем только есть такой файл есть в базе
-		$this->db->query('SELECT 1 FROM __images WHERE filename=? LIMIT 1', $filename);
-		if(!$this->db->result())
+		db()->query('SELECT 1 FROM __images WHERE filename=? LIMIT 1', $filename);
+		if(!db()->result())
 			return false;
 		
 		// Имя оригинального файла
@@ -133,7 +133,7 @@ class Image
 			else
 				$new_name = $base.'_1.'.$ext;
 		}
-		$this->db->query('UPDATE __images SET filename=? WHERE filename=?', $new_name, $filename);
+		db()->query('UPDATE __images SET filename=? WHERE filename=?', $new_name, $filename);
 		
 		// Перед долгим копированием займем это имя
 		fclose(fopen($this->config->root_dir.$this->config->original_images_dir.$new_name, 'w'));
