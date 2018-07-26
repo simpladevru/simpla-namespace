@@ -61,4 +61,13 @@ class SettingsArrayStorage implements StorageSettingInterface
     {
         $this->vars[$name] = $value;
     }
+
+    /**
+     * @param $name
+     * @return bool
+     */
+    public function has($name)
+    {
+        return !empty($this->vars[$name]);
+    }
 }

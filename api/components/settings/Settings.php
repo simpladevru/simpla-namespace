@@ -1,8 +1,6 @@
 <?php
 
-namespace Root\api;
-
-use Root\api\components\settings\StorageSettingInterface;
+namespace Root\api\components\settings;
 
 /**
  * Class Settings
@@ -23,10 +21,14 @@ class Settings
     /**
      * @param $name
      * @return mixed
+     * @throws \Exception
      */
 	public function __get($name)
 	{
-        return $this->storage->get($name);
+	    if ($this->storage->has($name)) {
+            return $this->storage->get($name);
+        }
+        throw new \Exception('Wrong setting');
 	}
 
     /**

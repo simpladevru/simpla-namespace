@@ -5,7 +5,7 @@ namespace Root\api\components\settings;
 use Root\api\Database;
 
 /**
- * Class SittingsDbStorage
+ * Class SettingsDbStorage
  * @package Root\api\components\settings
  */
 class SettingsDbStorage implements StorageSettingInterface
@@ -19,10 +19,18 @@ class SettingsDbStorage implements StorageSettingInterface
         $this->init();
     }
 
+    public static function table()
+    {
+        return '__settings';
+    }
+
     private function init()
     {
-        $this->db->query('SELECT name, value FROM __settings');
-        foreach($this->db->results() as $result) {
+        $query = db()->build()
+            ->select(['name', 'value'])
+            ->from(static::table());
+
+        foreach($query->all() as $result) {
             if(!($this->vars[$result->name] = @unserialize($result->value))) {
                 $this->vars[$result->name] = $result->value;
             }
@@ -63,5 +71,14 @@ class SettingsDbStorage implements StorageSettingInterface
         else {
             $this->db->query('INSERT INTO __settings SET value=?, name=?', $value, $name);
         }
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     */
+    public function has($name)
+    {
+        return !empty($this->vars[$name]);
     }
 }

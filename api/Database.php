@@ -2,6 +2,8 @@
 
 namespace Root\api;
 
+use Root\api\components\db\Query;
+
 /**
  * Класс для доступа к базе данных
  *
@@ -73,6 +75,13 @@ class Database
         }
 	}
 
+    /**
+     * @return Query
+     */
+	public function build()
+    {
+        return new Query($this);
+    }
 
     /**
      * @return mixed
@@ -153,18 +162,20 @@ class Database
 	public function result($field = null)
 	{
 		$result = array();
-		if(!$this->res)
-		{
+		if(!$this->res) {
 			$this->error_msg = "Could not execute query to database";
 			return 0;
 		}
 		$row = $this->res->fetch_object();
-		if(!empty($field) && isset($row->$field))
+		if(!empty($field) && isset($row->$field)) {
 			return $row->$field;
-		elseif(!empty($field) && !isset($row->$field))
+        }
+		elseif(!empty($field) && !isset($row->$field)) {
 			return false;
-		else
+        }
+		else {
 			return $row;
+        }
 	}
 
     /**

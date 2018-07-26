@@ -2,18 +2,12 @@
 
 namespace Root\api;
 
-use Root\api\components\settings\SettingsArrayStorage;
+use Root\api\components\settings\Settings;
 use Root\api\components\settings\SettingsDbStorage;
 
 /**
- * Основной класс Simpla для доступа к API Simpla
- *
- * @copyright 	2014 Denis Pikusov
- * @link 		http://simplacms.ru
- * @author 		Denis Pikusov
- *
- * @property Container $app
- *
+ * Class Simpla
+ * @package Root\api
  */
 class Simpla
 {
@@ -51,7 +45,6 @@ class Simpla
 
             'settings'   => function($container) {
                 $storage = new SettingsDbStorage($container->db);
-                //$storage = new SettingsArrayStorage();
                 return new Settings($storage);
             },
 
