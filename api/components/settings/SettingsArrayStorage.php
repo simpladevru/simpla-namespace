@@ -59,12 +59,6 @@ class SettingsArrayStorage implements StorageSettingInterface
      */
     public function set($name, $value)
     {
-        if(is_array($value)) {
-            $value = serialize($value);
-        }
-        else {
-            $value = (string) $value;
-        }
         $this->vars[$name] = $value;
     }
 }
