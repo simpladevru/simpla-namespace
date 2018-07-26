@@ -50,8 +50,8 @@ class Simpla
             'db'         => Database::class,
 
             'settings'   => function($container) {
-                //$storage = new SittingsDbStorage($container->db);
-                $storage = new SettingsArrayStorage();
+                $storage = new SettingsDbStorage($container->db);
+                //$storage = new SettingsArrayStorage();
                 return new Settings($storage);
             },
 
