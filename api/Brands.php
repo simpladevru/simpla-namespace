@@ -1,6 +1,7 @@
 <?php
 
 namespace Root\api;
+use Root\helpers\Debug;
 
 /**
  * Simpla CMS
@@ -13,12 +14,12 @@ namespace Root\api;
 
 class Brands
 {
-	/*
-	*
-	* Функция возвращает массив брендов, удовлетворяющих фильтру
-	* @param $filter
-	*
-	*/
+    /*
+    *
+    * Функция возвращает массив брендов, удовлетворяющих фильтру
+    * @param $filter
+    *
+    */
 	public function get_brands($filter = array())
 	{
 		$category_id_filter = '';

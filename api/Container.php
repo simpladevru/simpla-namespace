@@ -3,7 +3,6 @@
 namespace Root\api;
 use ArrayAccess;
 use ReflectionClass;
-use Root\helpers\Debug;
 
 /**
  * Class Container
@@ -60,12 +59,13 @@ class Container implements ArrayAccess
     /**
      * Container constructor.
      * @param array $values
+     * @throws \Exception
      */
     public function __construct($values = [])
     {
         if( !empty($values) ) {
-            foreach ($values as $alice => $value) {
-                $this->set($alice, $value);
+            foreach ($values as $name => $value) {
+                $this->set($name, $value);
             }
         }
     }
@@ -84,40 +84,53 @@ class Container implements ArrayAccess
 
     /**
      * @param string $name
-     * @param $value
+     * @param null $value
      * @param bool $share
+     * @throws \Exception
      */
-    public function set(string $name, $value, bool $share = true)
+    public function set(string $name, $value = null, bool $share = true)
     {
+        if(! is_string($name) ) {
+            throw new \Exception('Container wrong name');
+        }
+
+        if( is_null($value) && class_exists($name) ) {
+            $value = $name;
+        }
+
         $this->services[$name] = $value;
         $this->shared[$name] = $share;
     }
 
     /**
      * @param string $name
-     * @param $value
+     * @param null $value
+     * @throws \Exception
      */
-    public function singleton(string $name, $value)
+    public function singleton(string $name, $value = null)
     {
         $this->set($name, $value, true);
     }
 
     /**
      * @param string $name
-     * @param $value
+     * @param null $value
+     * @throws \Exception
      */
-    public function instance(string $name, $value)
+    public function instance(string $name, $value = null)
     {
         $this->set($name, $value, false);
     }
 
     /**
-     * @param string $interface
+     * @param string $name
      * @return bool
      */
-    public function has(string $interface): bool
+    public function has(string $name): bool
     {
-        return isset($this->services[$interface]) || isset($this->instantiated[$interface]);
+        return isset($this->services[$name]) ||
+               isset($this->instantiated[$name]) ||
+               $this->is_alias($name);
     }
 
     /**
@@ -127,18 +140,19 @@ class Container implements ArrayAccess
      */
     public function get(string $name)
     {
+        $name = $this->get_alias($name);
+
         if (isset($this->instantiated[$name]) && $this->shared[$name]) {
             return $this->instantiated[$name];
         }
 
-        $service = $this->services[$name];
+        $service = $this->get_service($name);
 
         if( is_string($service) && class_exists($service) ) {
             $object = $this->build_object($service);
         }
         else if( is_array($service) && class_exists($obj = reset($service)) ) {
             $params = array_slice($service, 1);
-            //$object = new $obj(...$params);
             $object = $this->build_object($obj, $params);
         }
         else if ( $service instanceof \Closure ) {
@@ -150,8 +164,26 @@ class Container implements ArrayAccess
         if ( !empty($this->shared[$name]) ) {
             $this->instantiated[$name] = $object;
         }
+
         return $object;
     }
+
+    /**
+     * @param $name
+     * @return mixed
+     * @throws \Exception
+     */
+    private function get_service($name)
+    {
+        $name = $this->get_alias($name);
+
+        if( !empty($this->services[$name]) ) {
+            return $this->services[$name];
+        }
+
+        throw new \Exception('No service ' . $name);
+    }
+
 
     /**
      * @param string $name
@@ -208,26 +240,63 @@ class Container implements ArrayAccess
 
     /**
      * @param $name
+     * @throws \Exception
      */
     public function unset($name)
     {
         $this->unset($this->instantiated[$name]);
         $this->unset($this->services[$name]);
         $this->unset($this->shared[$name]);
+        $this->unset($this->aliases[$name]);
+
+        if( ($alias = $this->get_alias($name)) ) {
+            $this->unset($alias);
+        }
     }
 
     /**
      * @param $abstract
      * @param $alias
      */
-    public function alias($abstract, $alias)
+    public function set_alias($abstract, $alias)
     {
+        if( !$abstract || !$alias ) {
+            return;
+        }
         $this->aliases[$alias] = $abstract;
+    }
+
+    /**
+     * @param $abstract
+     * @return mixed
+     * @throws \Exception
+     */
+    public function get_alias($abstract)
+    {
+        if (! isset($this->aliases[$abstract]) ) {
+            return $abstract;
+        }
+
+        if ( $this->aliases[$abstract] === $abstract ) {
+            throw new \Exception("[{$abstract}] is aliased to itself.");
+        }
+
+        return $this->get_alias($this->aliases[$abstract]);
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     */
+    public function is_alias($name)
+    {
+        return isset($this->aliases[$name]);
     }
 
     /**
      * @param mixed $offset
      * @return bool|void
+     * @throws \Exception
      */
     public function offsetExists($offset)
     {
@@ -237,6 +306,7 @@ class Container implements ArrayAccess
     /**
      * @param mixed $offset
      * @return mixed|void
+     * @throws \ReflectionException
      */
     public function offsetGet($offset)
     {
@@ -246,6 +316,7 @@ class Container implements ArrayAccess
     /**
      * @param mixed $offset
      * @param mixed $value
+     * @throws \Exception
      */
     public function offsetSet($offset, $value)
     {
@@ -254,6 +325,7 @@ class Container implements ArrayAccess
 
     /**
      * @param mixed $offset
+     * @throws \Exception
      */
     public function offsetUnset($offset)
     {

@@ -10,9 +10,9 @@ if( !function_exists('simpla') )
      * @param string $api
      * @return mixed|\Root\api\Container
      */
-    function simpla($api = '')
+    function simpla($api = null)
     {
-        if($api) {
+        if(! is_null($api) ) {
             return Root\api\Simpla::$app->$api;
         }
         return Root\api\Simpla::$app;

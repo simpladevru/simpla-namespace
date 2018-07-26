@@ -15,15 +15,11 @@ class Database
 	private $mysqli;
 	private $res;
 
-	private $config;
-
     /**
      * Database constructor.
-     * @param $config
      */
-	public function __construct($config)
+	public function __construct()
 	{
-        $this->config = $config;
 		$this->connect();
 	}
 
@@ -41,7 +37,7 @@ class Database
 			return $this->mysqli;
         }
 		else {
-			$this->mysqli = new \mysqli($this->config->db_server, $this->config->db_user, $this->config->db_password, $this->config->db_name);
+			$this->mysqli = new \mysqli(config()->db_server, config()->db_user, config()->db_password, config()->db_name);
         }
 		
 		if($this->mysqli->connect_error) {
@@ -49,16 +45,16 @@ class Database
 			return false;
 		}
 		else {
-			if($this->config->db_charset) {
-				$this->mysqli->query('SET NAMES '.$this->config->db_charset);
+			if(config()->db_charset) {
+				$this->mysqli->query('SET NAMES '.config()->db_charset);
             }
 
-			if($this->config->db_sql_mode) {
-				$this->mysqli->query('SET SESSION SQL_MODE = "'.$this->config->db_sql_mode.'"');
+			if(config()->db_sql_mode) {
+				$this->mysqli->query('SET SESSION SQL_MODE = "'.config()->db_sql_mode.'"');
             }
 
-			if($this->config->db_timezone) {
-				$this->mysqli->query('SET time_zone = "'.$this->config->db_timezone.'"');
+			if(config()->db_timezone) {
+				$this->mysqli->query('SET time_zone = "'.config()->db_timezone.'"');
             }
 		}
 		return $this->mysqli;
@@ -109,7 +105,7 @@ class Database
 		$args = func_get_args();	
 		$tmpl = array_shift($args);
 		// Заменяем все __ на префикс, но только необрамленные кавычками
-		$tmpl = preg_replace('/([^"\'0-9a-z_])__([a-z_]+[^"\'])/i', "\$1".$this->config->db_prefix."\$2", $tmpl);
+		$tmpl = preg_replace('/([^"\'0-9a-z_])__([a-z_]+[^"\'])/i', "\$1".config()->db_prefix."\$2", $tmpl);
 		if(!empty($args))
 		{
 			$result = $this->sql_placeholder_ex($tmpl, $args, $error); 

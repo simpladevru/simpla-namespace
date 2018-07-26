@@ -19,6 +19,21 @@ class Simpla
     public function __construct()
     {
         static::$app = new Container($this->bootrstrap());
+
+        foreach ($this->alias() as $abstract => $alias) {
+            static::$app->set_alias($alias, $abstract);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    private function alias()
+    {
+        return [
+            Database::class => 'db',
+            Request::class => 'request'
+        ];
     }
 
     /**
@@ -29,9 +44,7 @@ class Simpla
         return [
             'config'     => Config::class,
             'request'    => Request::class,
-            'db'         => function($container) {
-                return new Database($container->config);
-            },
+            'db'         => Database::class,
             'settings'   => Settings::class,
             'design'     => Design::class,
             'products'   => Products::class,
