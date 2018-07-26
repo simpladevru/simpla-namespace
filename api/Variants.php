@@ -2,6 +2,8 @@
 
 namespace Root\api;
 
+use Root\helpers\Debug;
+
 /**
  * Работа с вариантами товаров
  *
@@ -14,12 +16,11 @@ namespace Root\api;
 class Variants
 {
     /**
-	* Функция возвращает варианты товара
-	* @param	$filter
-	* @retval	array
-	*/
+     * @param array $filter
+     * @return array|bool
+     */
 	public function get_variants($filter = array())
-	{		
+	{
 		$product_id_filter = '';
 		$variant_id_filter = '';
 		$instock_filter = '';
