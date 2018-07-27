@@ -29,7 +29,6 @@ class CartView extends View
     {
         Simpla::$container->cart->add_item($variant_id, $this->request->get('amount', 'integer'));
 	    header('location: '.Simpla::$container->config->root_url.'/cart/');
-		
     }
 
     // Удаление товара из корзины

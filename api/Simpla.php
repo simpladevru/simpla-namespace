@@ -2,9 +2,15 @@
 
 namespace Root\api;
 
+use Root\api\components\session\Session;
+
 use Root\api\components\settings\Settings;
 use Root\api\components\settings\SettingsDbStorage;
 use Root\api\components\settings\StorageSettingInterface;
+
+use Root\api\components\cart\base\Cart;
+use Root\api\components\cart\base\CartStorageInterface;
+use Root\api\components\cart\base\CartSessionStorage;
 
 /**
  * Class Simpla
@@ -46,7 +52,7 @@ class Simpla
     {
         $this->set_container();
         $this->register_services();
-        $this->set_settings_storage();
+        $this->register_storage();
     }
 
     public function set_container()
@@ -54,7 +60,7 @@ class Simpla
         static::$container = new \Illuminate\Container\Container();
     }
 
-    public function register_services()
+    private function register_services()
     {
         foreach($this->bootrstrap() as $abstract => $class) {
             static::$container->singleton($class);
@@ -62,10 +68,14 @@ class Simpla
         }
     }
 
-    public function set_settings_storage()
+    private function register_storage()
     {
         static::$container->singleton(
             StorageSettingInterface::class, SettingsDbStorage::class
+        );
+
+        static::$container->singleton(
+            CartStorageInterface::class, CartSessionStorage::class
         );
     }
 
@@ -76,9 +86,15 @@ class Simpla
     {
         return [
             'config'     => Config::class,
-            'request'    => Request::class,
-            'db'         => Database::class,
             'settings'   => Settings::class,
+
+            'db'         => Database::class,
+
+            'session'    => Session::class,
+            'request'    => Request::class,
+
+            'cart'       => Cart::class,
+
             'design'     => Design::class,
             'products'   => Products::class,
             'variants'   => Variants::class,
@@ -88,7 +104,6 @@ class Simpla
             'money'      => Money::class,
             'pages'      => Pages::class,
             'blog'       => Blog::class,
-            'cart'       => Cart::class,
             'image'      => Image::class,
             'delivery'   => Delivery::class,
             'payment'    => Payment::class,
