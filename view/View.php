@@ -31,12 +31,12 @@ abstract class View
 
     public function __construct()
     {
-        $this->pages    = Simpla::$app->pages;
-        $this->users    = Simpla::$app->users;
-        $this->request  = Simpla::$app->request;
-        $this->design   = Simpla::$app->design;
-        $this->config   = Simpla::$app->config;
-        $this->settings = Simpla::$app->settings;
+        $this->pages    = Simpla::$container->pages;
+        $this->users    = Simpla::$container->users;
+        $this->request  = Simpla::$container->request;
+        $this->design   = Simpla::$container->design;
+        $this->config   = Simpla::$container->config;
+        $this->settings = Simpla::$container->settings;
 
         $this->currencies = Simpla()->money->get_currencies(array('enabled'=>1));
 
@@ -46,7 +46,7 @@ abstract class View
         }
 
         if(isset($_SESSION['currency_id'])) {
-            $this->currency = Simpla::$app->money->get_currency($_SESSION['currency_id']);
+            $this->currency = Simpla::$container->money->get_currency($_SESSION['currency_id']);
         }
         else {
             $this->currency = reset($this->currencies);
@@ -78,14 +78,14 @@ abstract class View
         $this->design->assign('settings',	$this->settings);
 
         // Содержимое корзины
-        Simpla::$app->design->assign('cart', Simpla::$app->cart->get_cart());
+        Simpla::$container->design->assign('cart', Simpla::$container->cart->get_cart());
 
         // Категории товаров
-        Simpla::$app->design->assign('categories', Simpla::$app->categories->get_categories_tree());
+        Simpla::$container->design->assign('categories', Simpla::$container->categories->get_categories_tree());
 
         // Страницы
-        $pages = Simpla::$app->pages->get_pages(array('visible'=>1));
-        Simpla::$app->design->assign('pages', $pages);
+        $pages = Simpla::$container->pages->get_pages(array('visible'=>1));
+        Simpla::$container->design->assign('pages', $pages);
 
         // Настраиваем плагины для смарти
         $this->design->smarty->registerPlugin("function", "get_posts",					array($this, 'get_posts_plugin'));
@@ -107,14 +107,14 @@ abstract class View
             $params['visible'] = 1;
         }
         if(!empty($params['var'])) {
-            $smarty->assign($params['var'], Simpla::$app->blog->get_posts($params));
+            $smarty->assign($params['var'], Simpla::$container->blog->get_posts($params));
         }
     }
 
     public function get_brands_plugin($params, $smarty)
     {
         if(!empty($params['var'])) {
-            $smarty->assign($params['var'], Simpla::$app->brands->get_brands($params));
+            $smarty->assign($params['var'], Simpla::$container->brands->get_brands($params));
         }
     }
 
@@ -130,11 +130,11 @@ abstract class View
             }
 
             $products = array();
-            foreach(Simpla::$app->products->get_products(array('id'=>$browsed_products_ids, 'visible'=>1)) as $p) {
+            foreach(Simpla::$container->products->get_products(array('id'=>$browsed_products_ids, 'visible'=>1)) as $p) {
                 $products[$p->id] = $p;
             }
 
-            $browsed_products_images = Simpla::$app->products->get_images(array('product_id'=>$browsed_products_ids));
+            $browsed_products_images = Simpla::$container->products->get_images(array('product_id'=>$browsed_products_ids));
             foreach($browsed_products_images as $browsed_product_image) {
                 if(isset($products[$browsed_product_image->product_id])) {
                     $products[$browsed_product_image->product_id]->images[] = $browsed_product_image;
@@ -162,7 +162,7 @@ abstract class View
         $params['featured'] = 1;
         if(!empty($params['var']))
         {
-            foreach(Simpla::$app->products->get_products($params) as $p)
+            foreach(Simpla::$container->products->get_products($params) as $p)
                 $products[$p->id] = $p;
 
             if(!empty($products))
@@ -171,7 +171,7 @@ abstract class View
                 $products_ids = array_keys($products);
 
                 // Выбираем варианты товаров
-                $variants = Simpla::$app->variants->get_variants(array('product_id'=>$products_ids, 'in_stock'=>true));
+                $variants = Simpla::$container->variants->get_variants(array('product_id'=>$products_ids, 'in_stock'=>true));
 
                 // Для каждого варианта
                 foreach($variants as &$variant)
@@ -181,7 +181,7 @@ abstract class View
                 }
 
                 // Выбираем изображения товаров
-                $images = Simpla::$app->products->get_images(array('product_id'=>$products_ids));
+                $images = Simpla::$container->products->get_images(array('product_id'=>$products_ids));
                 foreach($images as $image)
                     $products[$image->product_id]->images[] = $image;
 
@@ -208,7 +208,7 @@ abstract class View
             $params['sort'] = 'created';
         if(!empty($params['var']))
         {
-            foreach(Simpla::$app->products->get_products($params) as $p)
+            foreach(Simpla::$container->products->get_products($params) as $p)
                 $products[$p->id] = $p;
 
             if(!empty($products))
@@ -217,7 +217,7 @@ abstract class View
                 $products_ids = array_keys($products);
 
                 // Выбираем варианты товаров
-                $variants = Simpla::$app->variants->get_variants(array('product_id'=>$products_ids, 'in_stock'=>true));
+                $variants = Simpla::$container->variants->get_variants(array('product_id'=>$products_ids, 'in_stock'=>true));
 
                 // Для каждого варианта
                 foreach($variants as &$variant)
@@ -227,7 +227,7 @@ abstract class View
                 }
 
                 // Выбираем изображения товаров
-                $images = Simpla::$app->products->get_images(array('product_id'=>$products_ids));
+                $images = Simpla::$container->products->get_images(array('product_id'=>$products_ids));
                 foreach($images as $image)
                     $products[$image->product_id]->images[] = $image;
 
@@ -253,7 +253,7 @@ abstract class View
         $params['discounted'] = 1;
         if(!empty($params['var']))
         {
-            foreach(Simpla::$app->products->get_products($params) as $p)
+            foreach(Simpla::$container->products->get_products($params) as $p)
                 $products[$p->id] = $p;
 
             if(!empty($products))
@@ -262,7 +262,7 @@ abstract class View
                 $products_ids = array_keys($products);
 
                 // Выбираем варианты товаров
-                $variants = Simpla::$app->variants->get_variants(array('product_id'=>$products_ids, 'in_stock'=>true));
+                $variants = Simpla::$container->variants->get_variants(array('product_id'=>$products_ids, 'in_stock'=>true));
 
                 // Для каждого варианта
                 foreach($variants as &$variant)
@@ -272,7 +272,7 @@ abstract class View
                 }
 
                 // Выбираем изображения товаров
-                $images = Simpla::$app->products->get_images(array('product_id'=>$products_ids));
+                $images = Simpla::$container->products->get_images(array('product_id'=>$products_ids));
                 foreach($images as $image)
                     $products[$image->product_id]->images[] = $image;
 

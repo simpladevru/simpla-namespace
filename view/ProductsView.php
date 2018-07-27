@@ -33,7 +33,7 @@ class ProductsView extends View
 		// Если задан бренд, выберем его из базы
 		if (!empty($brand_url))
 		{
-			$brand = Simpla::$app->brands->get_brand((string)$brand_url);
+			$brand = Simpla::$container->brands->get_brand((string)$brand_url);
 			if (empty($brand))
 				return false;
 			$this->design->assign('brand', $brand);
@@ -43,7 +43,7 @@ class ProductsView extends View
 		// Выберем текущую категорию
 		if (!empty($category_url))
 		{
-			$category = Simpla::$app->categories->get_category((string)$category_url);
+			$category = Simpla::$container->categories->get_category((string)$category_url);
 			if (empty($category) || (!$category->visible && empty($_SESSION['admin'])))
 				return false;
 			$this->design->assign('category', $category);
@@ -71,7 +71,7 @@ class ProductsView extends View
 		if(!empty($category))
 		{
 			$features = array();
-			foreach(Simpla::$app->features->get_features(array('category_id'=>$category->id, 'in_filter'=>1)) as $feature)
+			foreach(Simpla::$container->features->get_features(array('category_id'=>$category->id, 'in_filter'=>1)) as $feature)
 			{ 
 				$features[$feature->id] = $feature;
 				if(($val = strval($this->request->get($feature->id)))!='')
@@ -89,7 +89,7 @@ class ProductsView extends View
 			if(!empty($brand))
 				$options_filter['brand_id'] = $brand->id;
 			
-			$options = Simpla::$app->features->get_options($options_filter);
+			$options = Simpla::$container->features->get_options($options_filter);
 
 			foreach($options as $option)
 			{
@@ -114,7 +114,7 @@ class ProductsView extends View
 		$current_page = max(1, $current_page);
 		$this->design->assign('current_page_num', $current_page);
 		// Вычисляем количество страниц
-		$products_count = Simpla::$app->products->count_products($filter);
+		$products_count = Simpla::$container->products->count_products($filter);
 		
 		// Показать все страницы сразу
 		if($this->request->get('page') == 'all')
@@ -133,12 +133,12 @@ class ProductsView extends View
 		
 
 		$discount = 0;
-		if(isset($_SESSION['user_id']) && $user = Simpla::$app->users->get_user(intval($_SESSION['user_id'])))
+		if(isset($_SESSION['user_id']) && $user = Simpla::$container->users->get_user(intval($_SESSION['user_id'])))
 			$discount = $user->discount;
 			
 		// Товары 
 		$products = array();
-		foreach(Simpla::$app->products->get_products($filter) as $p)
+		foreach(Simpla::$container->products->get_products($filter) as $p)
 			$products[$p->id] = $p;
 			
 		// Если искали товар и найден ровно один - перенаправляем на него
@@ -155,7 +155,7 @@ class ProductsView extends View
 				$product->properties = array();
 			}
 	
-			$variants = Simpla::$app->variants->get_variants(array('product_id'=>$products_ids, 'in_stock'=>true));
+			$variants = Simpla::$container->variants->get_variants(array('product_id'=>$products_ids, 'in_stock'=>true));
 			
 			foreach($variants as &$variant)
 			{
@@ -163,7 +163,7 @@ class ProductsView extends View
 				$products[$variant->product_id]->variants[] = $variant;
 			}
 	
-			$images = Simpla::$app->products->get_images(array('product_id'=>$products_ids));
+			$images = Simpla::$container->products->get_images(array('product_id'=>$products_ids));
 			foreach($images as $image)
 				$products[$image->product_id]->images[] = $image;
 
@@ -188,7 +188,7 @@ class ProductsView extends View
 		// Выбираем бренды, они нужны нам в шаблоне	
 		if(!empty($category))
 		{
-			$brands = Simpla::$app->brands->get_brands(array('category_id'=>$category->children, 'visible'=>1));
+			$brands = Simpla::$container->brands->get_brands(array('category_id'=>$category->children, 'visible'=>1));
 			$category->brands = $brands;		
 		}
 		

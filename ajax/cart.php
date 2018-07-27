@@ -5,7 +5,7 @@ use Root\api\Simpla;
 session_start();
 
 	require_once __DIR__ . '/../bootstrap/app.php';
-	$simpla = Simpla::$app;
+	$simpla = Simpla::$container;
 
 	$simpla->cart->add_item($simpla->request->get('variant', 'integer'), $simpla->request->get('amount', 'integer'));
 	$cart = $simpla->cart->get_cart();

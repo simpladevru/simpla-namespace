@@ -10,7 +10,7 @@ class NotFoundView extends View
     {
         header("http/1.0 404 not found");
 
-        $page = Simpla::$app->pages->get_page('404');
+        $page = Simpla::$container->pages->get_page('404');
 
         if( !empty($page) ) {
             $this->design->assign('page', $page);

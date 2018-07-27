@@ -13,9 +13,9 @@ if( !function_exists('simpla') )
     function simpla($api = null)
     {
         if(! is_null($api) ) {
-            return Root\api\Simpla::$app->$api;
+            return Root\api\Simpla::$container->get($api);
         }
-        return Root\api\Simpla::$app;
+        return Root\api\Simpla::$container;
     }
 }
 

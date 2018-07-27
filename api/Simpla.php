@@ -4,33 +4,69 @@ namespace Root\api;
 
 use Root\api\components\settings\Settings;
 use Root\api\components\settings\SettingsDbStorage;
+use Root\api\components\settings\StorageSettingInterface;
 
 /**
  * Class Simpla
  * @package Root\api
+ *
+ * @property \Illuminate\Container\Container $container
+ *
+ * * @property Config $config
+ * @property Request $request
+ * @property Database $db
+ * @property Settings $settings
+ * @property Design $design
+ * @property Products $products
+ * @property Variants $variants
+ * @property Categories $categories
+ * @property Brands $brands
+ * @property Features $features
+ * @property Money $money
+ * @property Pages $pages
+ * @property Blog $blog
+ * @property Cart $cart
+ * @property Image $image
+ * @property Delivery $delivery
+ * @property Payment $payment
+ * @property Orders $orders
+ * @property Users $users
+ * @property Coupons $coupons
+ * @property Comments $comments
+ * @property Feedbacks $feedbacks
+ * @property Notify $notify
+ * @property Managers $managers
  */
 class Simpla
 {
-    public static $app;
+    public static $container;
+    public static $test;
 
     public function __construct()
     {
-        static::$app = new Container($this->bootrstrap());
+        $this->set_container();
+        $this->register_services();
+        $this->set_settings_storage();
+    }
 
-        foreach ($this->alias() as $abstract => $alias) {
-            static::$app->set_alias($alias, $abstract);
+    public function set_container()
+    {
+        static::$container = new \Illuminate\Container\Container();
+    }
+
+    public function register_services()
+    {
+        foreach($this->bootrstrap() as $abstract => $class) {
+            static::$container->singleton($class);
+            static::$container->alias($class, $abstract);
         }
     }
 
-    /**
-     * @return array
-     */
-    private function alias()
+    public function set_settings_storage()
     {
-        return [
-            Database::class => 'db',
-            Request::class => 'request'
-        ];
+        static::$container->singleton(
+            StorageSettingInterface::class, SettingsDbStorage::class
+        );
     }
 
     /**
@@ -42,12 +78,7 @@ class Simpla
             'config'     => Config::class,
             'request'    => Request::class,
             'db'         => Database::class,
-
-            'settings'   => function($container) {
-                $storage = new SettingsDbStorage($container->db);
-                return new Settings($storage);
-            },
-
+            'settings'   => Settings::class,
             'design'     => Design::class,
             'products'   => Products::class,
             'variants'   => Variants::class,

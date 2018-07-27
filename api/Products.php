@@ -1,6 +1,7 @@
 <?php
 
 namespace Root\api;
+use Root\helpers\Debug;
 
 /**
  * Работа с товарами
@@ -13,7 +14,7 @@ namespace Root\api;
 
 class Products
 {
-	/**
+    /**
 	* Функция возвращает товары
 	* Возможные значения фильтра:
 	* id - id товара или их массив

@@ -17,11 +17,14 @@ class Database
 	private $mysqli;
 	private $res;
 
+	private $config;
+
     /**
      * Database constructor.
      */
-	public function __construct()
+	public function __construct(Config $config)
 	{
+	    $this->config = $config;
 		$this->connect();
 	}
 

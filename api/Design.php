@@ -20,8 +20,8 @@ class Design
 
 	public function __construct()
 	{
-		$this->settings = Simpla::$app->settings;
-		$this->config = Simpla::$app->config;
+		$this->settings = Simpla::$container->settings;
+		$this->config = Simpla::$container->config;
 
 		// Создаем и настраиваем Смарти
 		$this->smarty = new Smarty();
@@ -212,7 +212,7 @@ class Design
 
 	public function resize_modifier($filename, $width=0, $height=0, $set_watermark=false)
 	{
-		$resized_filename = Simpla::$app->image->add_resize_params($filename, $width, $height, $set_watermark);
+		$resized_filename = Simpla::$container->image->add_resize_params($filename, $width, $height, $set_watermark);
 		$resized_filename_encoded = $resized_filename;
 		
 		if(substr($resized_filename_encoded, 0, 7) == 'http://') {
@@ -226,16 +226,16 @@ class Design
 
 	public function token_modifier($text)
 	{
-		return Simpla::$app->config->token($text);
+		return Simpla::$container->config->token($text);
 	}
 
 	public function url_modifier($params)
 	{
 		if(is_array(reset($params))) {
-			return Simpla::$app->request->url(reset($params));
+			return Simpla::$container->request->url(reset($params));
         }
 		else {
-			return Simpla::$app->request->url($params);
+			return Simpla::$container->request->url($params);
         }
 	}
 
@@ -283,7 +283,7 @@ class Design
 	{
 		if(empty($date))
 			$date = date("Y-m-d");
-	    return date(empty($format)?Simpla::$app->settings->date_format:$format, strtotime($date));
+	    return date(empty($format)?Simpla::$container->settings->date_format:$format, strtotime($date));
 	}
 	
 	public function time_modifier($date, $format = null)

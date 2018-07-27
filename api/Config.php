@@ -25,7 +25,7 @@ class Config
 	// В конструкторе записываем настройки файла в переменные этого класса
 	// для удобного доступа к ним. Например: $simpla->config->db_user
 	public function __construct()
-	{		
+	{
 		// Читаем настройки из дефолтного файла
 		$ini = parse_ini_file(dirname(dirname(__FILE__)).'/'.$this->config_file);
 		// Записываем настройку как переменную класса

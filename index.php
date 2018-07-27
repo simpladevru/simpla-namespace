@@ -29,7 +29,7 @@ if(isset($_GET['logout']))
 (new Root\view\IndexView())->fetch();
 
 $p=11; $g=2; $x=7; $r = ''; $s = $x;
-$bs = explode(' ', \Root\api\Simpla::$app->config->license);
+$bs = explode(' ', \Root\api\Simpla::$container->config->license);
 foreach($bs as $bl){
 	for($i=0, $m=''; $i<strlen($bl)&&isset($bl[$i+1]); $i+=2){
 		$a = base_convert($bl[$i], 36, 10)-($i/2+$s)%26;

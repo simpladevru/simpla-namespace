@@ -20,8 +20,8 @@ class Image
 
 	public function __construct()
 	{
-        $this->config   = Simpla::$app->config;
-        $this->settings = Simpla::$app->settings;
+        $this->config   = Simpla::$container->config;
+        $this->settings = Simpla::$container->settings;
 	}
 
 

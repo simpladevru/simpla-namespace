@@ -31,15 +31,15 @@ class IndexView
             $content = $this->not_found()->fetch();
 		}
 
-        Simpla::$app->design->assign('content', $content);
-        Simpla::$app->design->assign('module', $this->module);
+        Simpla::$container->design->assign('content', $content);
+        Simpla::$container->design->assign('module', $this->module);
 
-		if(is_null( $wrapper = Simpla::$app->design->get_var('wrapper') )) {
+		if(is_null( $wrapper = Simpla::$container->design->get_var('wrapper') )) {
 			$wrapper = 'index.tpl';
         }
 
         $this->body = !empty($wrapper)
-            ? Simpla::$app->design->fetch($wrapper)
+            ? Simpla::$container->design->fetch($wrapper)
             : $content;
 
         $this->print_result($this->body);
@@ -47,7 +47,7 @@ class IndexView
 
 	public function get_module()
     {
-        $this->module = Simpla::$app->request->get('module', 'string');
+        $this->module = Simpla::$container->request->get('module', 'string');
         $this->module = preg_replace("/[^A-Za-z0-9]+/", "", $this->module);
 
         $module = "Root\\view\\" . $this->module;

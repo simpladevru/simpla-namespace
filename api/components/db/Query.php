@@ -38,7 +38,7 @@ class Query
 
     public function from($table)
     {
-        $this->from = (array) $table;
+        $this->from[] = $table;
         return $this;
     }
 

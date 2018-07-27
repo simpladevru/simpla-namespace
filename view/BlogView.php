@@ -37,7 +37,7 @@ class BlogView extends View
 	private function fetch_post($url)
 	{
 		// Выбираем пост из базы
-		$post = Simpla::$app->blog->get_post($url);
+		$post = Simpla::$container->blog->get_post($url);
 		
 		// Если не найден - ошибка
 		if(!$post || (!$post->visible && empty($_SESSION['admin'])))
@@ -85,7 +85,7 @@ class BlogView extends View
 					$comment->approved = 1;
 				
 				// Добавляем комментарий в базу
-				$comment_id = Simpla::$app->comments->add_comment($comment);
+				$comment_id = Simpla::$container->comments->add_comment($comment);
 				
 				// Отправляем email
 				$this->notify->email_comment_admin($comment_id);				
@@ -97,13 +97,13 @@ class BlogView extends View
 		}
 		
 		// Комментарии к посту
-		$comments = Simpla::$app->comments->get_comments(array('type'=>'blog', 'object_id'=>$post->id, 'approved'=>1, 'ip'=>$_SERVER['REMOTE_ADDR']));
+		$comments = Simpla::$container->comments->get_comments(array('type'=>'blog', 'object_id'=>$post->id, 'approved'=>1, 'ip'=>$_SERVER['REMOTE_ADDR']));
 		$this->design->assign('comments', $comments);
 		$this->design->assign('post',      $post);
 		
 		// Соседние записи
-		$this->design->assign('next_post', Simpla::$app->blog->get_next_post($post->id));
-		$this->design->assign('prev_post', Simpla::$app->blog->get_prev_post($post->id));
+		$this->design->assign('next_post', Simpla::$container->blog->get_next_post($post->id));
+		$this->design->assign('prev_post', Simpla::$container->blog->get_prev_post($post->id));
 		
 		// Мета-теги
 		$this->design->assign('meta_title', $post->meta_title);
@@ -132,7 +132,7 @@ class BlogView extends View
 		$this->design->assign('current_page_num', $current_page);
 
 		// Вычисляем количество страниц
-		$posts_count = Simpla::$app->blog->count_posts($filter);
+		$posts_count = Simpla::$container->blog->count_posts($filter);
 
 		// Показать все страницы сразу
 		if($this->request->get('page') == 'all')
@@ -145,7 +145,7 @@ class BlogView extends View
 		$filter['limit'] = $items_per_page;
 		
 		// Выбираем статьи из базы
-		$posts = Simpla::$app->blog->get_posts($filter);
+		$posts = Simpla::$container->blog->get_posts($filter);
 		if(empty($posts))
 			return false;
 		

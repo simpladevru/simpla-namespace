@@ -49,7 +49,7 @@ class Variants
 					$variant_id_filter  
 					$instock_filter 
 					ORDER BY v.position       
-					", Simpla::$app->settings->max_order_amount);
+					", Simpla::$container->settings->max_order_amount);
 
 		db()->query($query);	
 		return db()->results();

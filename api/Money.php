@@ -26,7 +26,7 @@ class Money
 			$this->thousands_separator = $this->settings->price_thousands_separator;
         }
 
-		Simpla::$app->design->smarty->registerPlugin('modifier', 'convert', array($this, 'convert'));
+		Simpla::$container->design->smarty->registerPlugin('modifier', 'convert', array($this, 'convert'));
 
 		$this->init_currencies();
 	}
