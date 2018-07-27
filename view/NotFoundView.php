@@ -3,11 +3,14 @@
 namespace Root\view;
 
 use Root\api\Simpla;
+use Root\helpers\Debug;
 
 class NotFoundView extends View
 {
     function fetch()
     {
+        Debug::print_r($this->currencies);
+
         header("http/1.0 404 not found");
 
         $page = Simpla::$container->pages->get_page('404');

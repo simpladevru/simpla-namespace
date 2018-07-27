@@ -1,14 +1,15 @@
 <?php
 
-require __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$simpla = new Root\api\Simpla();
+(new Root\api\Simpla);
 
 if( !function_exists('simpla') )
 {
     /**
-     * @param string $api
-     * @return mixed|\Root\api\Container
+     * @param null $api
+     * @return array|mixed|object|\Root\api\Container|string
+     * @throws ReflectionException
      */
     function simpla($api = null)
     {

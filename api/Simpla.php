@@ -16,7 +16,7 @@ use Root\api\components\cart\base\CartSessionStorage;
  * Class Simpla
  * @package Root\api
  *
- * @property \Illuminate\Container\Container $container
+ * @property Container $container
  *
  * * @property Config $config
  * @property Request $request
@@ -57,14 +57,14 @@ class Simpla
 
     public function set_container()
     {
-        static::$container = new \Illuminate\Container\Container();
+        static::$container = new Container();
     }
 
     private function register_services()
     {
         foreach($this->bootrstrap() as $abstract => $class) {
             static::$container->singleton($class);
-            static::$container->alias($class, $abstract);
+            static::$container->set_alias($class, $abstract);
         }
     }
 

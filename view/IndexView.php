@@ -2,6 +2,7 @@
 
 namespace Root\view;
 use Root\api\Simpla;
+use Root\helpers\Debug;
 
 /**
  * Simpla CMS
@@ -23,7 +24,7 @@ class IndexView
 	private $module;
 	private $body;
 
-	function fetch()
+    function fetch()
 	{
 	    $module = $this->get_module();
 

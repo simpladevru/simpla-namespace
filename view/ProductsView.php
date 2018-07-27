@@ -23,6 +23,8 @@ class ProductsView extends View
 	 */	
 	function fetch()
 	{
+        $this->currencies = [];
+
 		// GET-Параметры
 		$category_url = $this->request->get('category', 'string');
 		$brand_url    = $this->request->get('brand', 'string');

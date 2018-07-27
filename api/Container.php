@@ -32,16 +32,10 @@ class Container implements ArrayAccess
 
     /**
      * Container constructor.
-     * @param array $values
-     * @throws \Exception
      */
-    public function __construct($values = [])
+    public function __construct()
     {
-        if( !empty($values) ) {
-            foreach ($values as $name => $value) {
-                $this->set($name, $value);
-            }
-        }
+
     }
 
     /**
