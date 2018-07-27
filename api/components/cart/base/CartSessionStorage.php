@@ -64,7 +64,7 @@ class CartSessionStorage implements CartStorageInterface
 
     public function has_coupon_code()
     {
-        return !isset($_SESSION[static::COUPON_KEY]);
+        return isset($_SESSION[static::COUPON_KEY]);
     }
 
     public function set_coupon_code($code)
