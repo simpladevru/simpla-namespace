@@ -11,7 +11,7 @@ use Root\api\components\session\Session;
 class CartSessionStorage implements CartStorageInterface
 {
     const CART_KEY = 'shopping_cart';
-    const COUPON_KEY = 'shopping_cart';
+    const COUPON_KEY = 'coupon_code';
 
     public function __construct(Session $session)
     {
