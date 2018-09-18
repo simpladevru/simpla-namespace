@@ -19,6 +19,10 @@ class ComposerStaticInit4fb241d291a78cd4d73c93e69aff2ac5
         array (
             'Root\\' => 5,
         ),
+        'M' => 
+        array (
+            'Mpociot\\Pipeline\\' => 17,
+        ),
         'A' => 
         array (
             'Api\\' => 4,
@@ -33,6 +37,10 @@ class ComposerStaticInit4fb241d291a78cd4d73c93e69aff2ac5
         'Root\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
+        ),
+        'Mpociot\\Pipeline\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mpociot/pipeline/src',
         ),
         'Api\\' => 
         array (

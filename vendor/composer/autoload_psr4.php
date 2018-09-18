@@ -8,5 +8,6 @@ $baseDir = dirname($vendorDir);
 return array(
     'View\\' => array($baseDir . '/view'),
     'Root\\' => array($baseDir . '/'),
+    'Mpociot\\Pipeline\\' => array($vendorDir . '/mpociot/pipeline/src'),
     'Api\\' => array($baseDir . '/api'),
 );
