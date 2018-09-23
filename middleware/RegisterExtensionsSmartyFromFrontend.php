@@ -16,8 +16,10 @@ class RegisterExtensionsSmartyFromFrontend
 {
     public function __invoke($request, $next)
     {
-        SmartyExtension::add(AppExtension::class);
-        SmartyExtension::add(ShopExtension::class);
+        SmartyExtension::extensions([
+            AppExtension::class,
+            ShopExtension::class
+        ]);
 
         return $next($request);
     }

@@ -10,8 +10,16 @@ namespace Root\api\components\design\smarty;
 
 use Root\api\Simpla;
 
+/**
+ * Class SmartyExtension
+ * @package Root\api\components\design\smarty
+ */
 class SmartyExtension
 {
+    /**
+     * @param SmartyExtensionInterface $extension
+     * @return bool
+     */
     public static function add($extension)
     {
         if(! class_exists($extension) ) {
@@ -25,5 +33,15 @@ class SmartyExtension
         }
 
         $extension->register();
+    }
+
+    /**
+     * @param SmartyExtensionInterface[] $extensions
+     */
+    public static function extensions($extensions = [])
+    {
+        foreach ($extensions as $extension) {
+            static::add($extension);
+        }
     }
 }
