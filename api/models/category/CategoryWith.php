@@ -25,6 +25,10 @@ class CategoryWith
 
     public function brands($filter = ['visible' => 1])
     {
+        if( empty($this->category->children) ) {
+            return $this;
+        }
+
         $this->category->brands = Simpla::$container->brands->get_brands(array_filter(array_merge([
             'category_id' => $this->category->children,
         ], $filter)));
