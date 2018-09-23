@@ -1,8 +1,10 @@
 <?PHP
 
 namespace Root\view;
+use Root\api\models\category\CategoryWith;
 use Root\api\models\product\ProductsWith;
 use Root\api\Simpla;
+use Root\helpers\Debug;
 
 /**
  * Simpla CMS
@@ -31,25 +33,29 @@ class ProductsView extends View
 		$brand_url    = $this->request->get('brand', 'string');
 		
 		$filter = array();
-		$filter['visible'] = 1;	
+		$filter['visible'] = 1;
+
+        $brand = null;
 
 		// Если задан бренд, выберем его из базы
 		if (!empty($brand_url))
 		{
 			$brand = Simpla::$container->brands->get_brand((string)$brand_url);
-			if (empty($brand))
+			if (empty($brand)) {
 				return false;
-			$this->design->assign('brand', $brand);
+            }
 			$filter['brand_id'] = $brand->id;
 		}
-		
+
+        $category = null;
+
 		// Выберем текущую категорию
 		if (!empty($category_url))
 		{
-			$category = Simpla::$container->categories->get_category((string)$category_url);
-			if (empty($category) || (!$category->visible && empty($_SESSION['admin'])))
+			$category = (new CategoryWith((string)$category_url))->brands()->get();
+			if (empty($category) || (!$category->visible && empty($_SESSION['admin']))) {
 				return false;
-			$this->design->assign('category', $category);
+            }
 			$filter['category_id'] = $category->children;
 		}
 
@@ -135,24 +141,22 @@ class ProductsView extends View
 		///////////////////////////////////////////////
 
 		$discount = 0;
-		if(isset($_SESSION['user_id']) && $user = Simpla::$container->users->get_user(intval($_SESSION['user_id'])))
+		if(isset($_SESSION['user_id']) && $user = Simpla::$container->users->get_user(intval($_SESSION['user_id']))) {
 			$discount = $user->discount;
+        }
 			
 		// Товары 
         $products = (new ProductsWith($filter))->images()->variants()->get();
         $this->design->assign('products', $products);
 			
 		// Если искали товар и найден ровно один - перенаправляем на него
-		if(!empty($keyword) && $products_count == 1)
+		if(!empty($keyword) && $products_count == 1) {
 			header('Location: '.$this->config->root_url.'/products/'.(reset($products))->url);
-		
-		// Выбираем бренды, они нужны нам в шаблоне	
-		if(!empty($category))
-		{
-			$brands = Simpla::$container->brands->get_brands(array('category_id'=>$category->children, 'visible'=>1));
-			$category->brands = $brands;		
-		}
-		
+        }
+
+        $this->design->assign('category', $category);
+        $this->design->assign('brand', $brand);
+
 		// Устанавливаем мета-теги в зависимости от запроса
 		if($this->page)
 		{
@@ -182,6 +186,6 @@ class ProductsView extends View
 		return $this->body;
 	}
 	
-	
+
 
 }
