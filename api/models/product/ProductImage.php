@@ -8,8 +8,6 @@
 
 namespace Root\api\models\product;
 
-use Root\api\Simpla;
-
 class ProductImage
 {
     public $id;
@@ -20,19 +18,7 @@ class ProductImage
 
     public function resize($width=0, $height=0, $set_watermark=false)
     {
-        $resized_filename = Simpla::$container->image->add_resize_params($this->filename, $width, $height, $set_watermark);
-        $resized_filename_encoded = $resized_filename;
-
-        if(substr($resized_filename_encoded, 0, 7) == 'http://') {
-            $resized_filename_encoded = rawurlencode($resized_filename_encoded);
-        }
-
-        $resized_filename_encoded = rawurlencode($resized_filename_encoded);
-
-        return Simpla::$container->config->root_url .'/'.
-            Simpla::$container->config->resized_images_dir .
-            $resized_filename_encoded .'?'.
-            Simpla::$container->config->token($resized_filename);
+        return ImageHelper::resize($this->filename, $width, $height, $set_watermark);
     }
 
 }

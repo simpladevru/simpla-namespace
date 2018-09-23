@@ -1,6 +1,7 @@
 <?php
 
 namespace Root\api;
+use Root\api\models\product\ImageHelper;
 use Smarty;
 
 /**
@@ -212,16 +213,7 @@ class Design
 
 	public function resize_modifier($filename, $width=0, $height=0, $set_watermark=false)
 	{
-		$resized_filename = Simpla::$container->image->add_resize_params($filename, $width, $height, $set_watermark);
-		$resized_filename_encoded = $resized_filename;
-		
-		if(substr($resized_filename_encoded, 0, 7) == 'http://') {
-			$resized_filename_encoded = rawurlencode($resized_filename_encoded);
-        }
-
-		$resized_filename_encoded = rawurlencode($resized_filename_encoded);
-
-		return $this->config->root_url.'/'.$this->config->resized_images_dir.$resized_filename_encoded.'?'.$this->config->token($resized_filename);
+		return ImageHelper::resize($filename, $width, $height, $set_watermark);
 	}
 
 	public function token_modifier($text)
