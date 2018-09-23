@@ -6,8 +6,10 @@
  * Time: 20:00
  */
 
-namespace Root\api\components\design\smarty;
+namespace Root\view\SmartyExtensions;
 
+use Root\api\components\design\smarty\BaseExtension;
+use Root\api\components\design\smarty\SmartyExtensionInterface;
 use Root\api\Simpla;
 
 class ShopExtension extends BaseExtension implements SmartyExtensionInterface

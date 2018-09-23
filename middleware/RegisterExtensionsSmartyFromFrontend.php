@@ -9,8 +9,8 @@
 namespace Root\middleware;
 
 use Root\api\components\design\smarty\AppExtension;
-use Root\api\components\design\smarty\ShopExtension;
 use Root\api\components\design\smarty\SmartyExtension;
+use Root\view\SmartyExtensions\ShopExtension;
 
 class RegisterExtensionsSmartyFromFrontend
 {
