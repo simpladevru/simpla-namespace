@@ -21,6 +21,13 @@ class RegisterExtensionsSmartyFromFrontend
             ShopExtension::class
         ]);
 
+//        SmartyExtension::extensions([
+//            AppExtension::class,
+//            BlogExtension::class,
+//            BrandExtension::class,
+//            ProductExtension::class
+//        ]);
+
         return $next($request);
     }
 }
