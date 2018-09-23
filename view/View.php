@@ -111,9 +111,6 @@ abstract class View
             // Страницы
             $pages = Simpla::$container->pages->get_pages(array('visible'=>1));
             Simpla::$container->design->assign('pages', $pages);
-
-            SmartyExtension::add(AppExtension::class);
-            SmartyExtension::add(ShopExtension::class);
         }
     }
 

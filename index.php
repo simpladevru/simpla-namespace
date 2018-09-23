@@ -14,6 +14,7 @@ $middleware = [
     \Root\middleware\TimerMiddleware::class,
     \Root\middleware\SessionStartMiddleware::class,
     \Root\middleware\LogoutMiddleware::class,
+    \Root\middleware\RegisterExtensionsSmartyFromFrontend::class,
     \Root\middleware\CheckLicenseMiddleware::class,
     new CallableMiddlewareDecorator(function() {
         return (new \Root\view\IndexView())->fetch();
