@@ -19,9 +19,14 @@ class Category
 
     public function visibleOrAdmin()
     {
-        if ( !$this->visible && empty($_SESSION['admin']) ) {
+        if ( !$this->isVisible() && empty($_SESSION['admin']) ) {
             return false;
         }
         return true;
+    }
+
+    public function isVisible()
+    {
+        return $this->visible ? true : false;
     }
 }
