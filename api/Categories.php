@@ -1,6 +1,7 @@
 <?php
 
 namespace Root\api;
+use Root\api\models\category\Category;
 
 /**
  * Simpla CMS
@@ -202,7 +203,7 @@ class Categories
 		
 		
 		db()->query($query);
-		$categories = db()->results();
+		$categories = db()->results(null, Category::class);
 
 		$finish = false;
 		// Не кончаем, пока не кончатся категории, или пока ниодну из оставшихся некуда приткнуть

@@ -52,8 +52,8 @@ class ProductsView extends View
 		// Выберем текущую категорию
 		if (!empty($category_url))
 		{
-			$category = (new CategoryWith((string)$category_url))->brands()->get();
-			if (empty($category) || (!$category->visible && empty($_SESSION['admin']))) {
+			$category = (new CategoryWith((string) $category_url))->brands()->get();
+			if ( empty($category) || !$category->visibleOrAdmin() ) {
 				return false;
             }
 			$filter['category_id'] = $category->children;

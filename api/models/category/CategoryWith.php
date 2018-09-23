@@ -16,7 +16,7 @@ class CategoryWith
 
     public function __construct($category)
     {
-        if( $category instanceof \stdClass ) {
+        if( $category instanceof Category ) {
             $this->category = clone $category;
         } elseif ( is_string($category) || is_integer($category) ) {
             $this->category = Simpla::$container->categories->get_category($category);
@@ -36,6 +36,9 @@ class CategoryWith
         return $this;
     }
 
+    /**
+     * @return Category
+     */
     public function get()
     {
         return $this->category;

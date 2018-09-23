@@ -134,9 +134,10 @@ class Database
 
     /**
      * @param null $field
+     * @param string $object
      * @return array|bool
      */
-	public function results($field = null)
+	public function results($field = null, $object = \stdClass::class)
 	{
 		$results = array();
 		if(!$this->res)
@@ -148,7 +149,7 @@ class Database
 		if($this->res->num_rows == 0)
 			return array();
 
-		while($row = $this->res->fetch_object())
+		while($row = $this->res->fetch_object($object))
 		{
 			if(!empty($field) && isset($row->$field))
 				array_push($results, $row->$field);				
