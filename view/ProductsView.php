@@ -148,7 +148,7 @@ class ProductsView extends View
 		// Товары 
         $products = (new ProductsWith($filter))->images()->variants()->get();
         $this->design->assign('products', $products);
-			
+
 		// Если искали товар и найден ровно один - перенаправляем на него
 		if(!empty($keyword) && $products_count == 1) {
 			header('Location: '.$this->config->root_url.'/products/'.(reset($products))->url);

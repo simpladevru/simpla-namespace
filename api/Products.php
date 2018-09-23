@@ -1,7 +1,7 @@
 <?php
 
 namespace Root\api;
-use Root\helpers\Debug;
+use Root\api\models\product\ProductImage;
 
 /**
  * Работа с товарами
@@ -431,7 +431,7 @@ class Products
 		$query = db()->placehold("SELECT i.id, i.product_id, i.name, i.filename, i.position
 									FROM __images AS i WHERE 1 $product_id_filter $group_by ORDER BY i.product_id, i.position");
 		db()->query($query);
-		return db()->results();
+		return db()->results(null, ProductImage::class);
 	}
 	
 	public function add_image($product_id, $filename, $name = '')

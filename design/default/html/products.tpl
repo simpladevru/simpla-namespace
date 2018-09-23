@@ -115,7 +115,7 @@
 		<!-- Фото товара -->
 		{if $product->image}
 		<div class="image">
-			<a href="products/{$product->url}"><img src="{$product->image->filename|resize:200:200}" alt="{$product->name|escape}"/></a>
+			<a href="products/{$product->url}"><img src="{$product->image->resize(200, 200)}" alt="{$product->name|escape}"/></a>
 		</div>
 		{/if}
 		<!-- Фото товара (The End) -->
