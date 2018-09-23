@@ -4,7 +4,7 @@ namespace Root\view;
 
 use Root\api\components\design\smarty\AppExtension;
 use Root\api\components\design\smarty\ShopExtension;
-use Root\api\components\design\smarty\SmartyExtension;
+use Root\api\components\design\smarty\RegisterSmartyExtension;
 use Root\api\Simpla;
 
 /**

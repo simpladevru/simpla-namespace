@@ -2,7 +2,8 @@
 
 namespace Root\api;
 use Root\api\components\design\smarty\AppExtension;
-use Root\api\components\design\smarty\SmartyExtension;
+use Root\api\components\design\smarty\RegisterSmartyExtension;
+use Root\helpers\Debug;
 use Smarty;
 
 /**
@@ -84,5 +85,4 @@ class Design
 	{
 		$this->smarty->clearAllCache();	
 	}
-
 }

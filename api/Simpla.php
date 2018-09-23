@@ -46,13 +46,24 @@ use Root\api\components\cart\base\CartSessionStorage;
 class Simpla
 {
     public static $container;
-    public static $test;
+
+    private static $instance;
 
     public function __construct()
     {
         $this->set_container();
         $this->register_services();
         $this->register_storage();
+
+        static::$instance = $this;
+    }
+
+    public static function getInstance()
+    {
+        if (is_null(static::$instance)) {
+            static::$instance = new static;
+        }
+        return static::$instance;
     }
 
     public function set_container()

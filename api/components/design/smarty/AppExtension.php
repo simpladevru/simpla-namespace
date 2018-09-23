@@ -11,7 +11,11 @@ namespace Root\api\components\design\smarty;
 use Root\api\models\product\ImageHelper;
 use Root\api\Simpla;
 
-class AppExtension extends BaseExtension implements SmartyExtensionInterface
+/**
+ * Class AppExtension
+ * @package Root\api\components\design\smarty
+ */
+class AppExtension extends SmartyExtension implements SmartyExtensionInterface
 {
     public function register()
     {

@@ -3,45 +3,32 @@
  * Created by PhpStorm.
  * User: davinci
  * Date: 23.09.2018
- * Time: 19:41
+ * Time: 20:07
  */
 
 namespace Root\api\components\design\smarty;
-
-use Root\api\Simpla;
+use Root\api\Container;
 
 /**
  * Class SmartyExtension
  * @package Root\api\components\design\smarty
+ *
+ * @property \Smarty $smarty
+ *
  */
-class SmartyExtension
+abstract class SmartyExtension
 {
-    /**
-     * @param SmartyExtensionInterface $extension
-     * @return bool
-     */
-    public static function add($extension)
-    {
-        if(! class_exists($extension) ) {
-            return false;
-        }
-
-        $extension = new $extension(Simpla::$container->design->smarty);
-
-        if(! $extension instanceof SmartyExtensionInterface ) {
-            return false;
-        }
-
-        $extension->register();
-    }
+    protected $smarty;
 
     /**
-     * @param SmartyExtensionInterface[] $extensions
+     * SmartyExtension constructor.
+     * @param Container $container
      */
-    public static function extensions($extensions = [])
+    public function __construct($container)
     {
-        foreach ($extensions as $extension) {
-            static::add($extension);
+        if(! $container->has('design') || empty($container->design->smarty) ) {
+            throw new BadSmartyExtensionException();
         }
+        $this->smarty = $container->design->smarty;
     }
 }

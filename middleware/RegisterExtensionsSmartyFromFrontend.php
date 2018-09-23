@@ -9,14 +9,14 @@
 namespace Root\middleware;
 
 use Root\api\components\design\smarty\AppExtension;
-use Root\api\components\design\smarty\SmartyExtension;
+use Root\api\components\design\smarty\RegisterSmartyExtension;
 use Root\view\SmartyExtensions\ShopExtension;
 
 class RegisterExtensionsSmartyFromFrontend
 {
     public function __invoke($request, $next)
     {
-        SmartyExtension::extensions([
+        RegisterSmartyExtension::extensions([
             AppExtension::class,
             ShopExtension::class
         ]);

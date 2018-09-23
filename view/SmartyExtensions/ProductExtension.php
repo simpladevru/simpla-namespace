@@ -10,14 +10,14 @@ namespace Root\view\SmartyExtensions;
 
 use Root\api\Simpla;
 
-use Root\api\components\design\smarty\BaseExtension;
+use Root\api\components\design\smarty\SmartyExtension;
 use Root\api\components\design\smarty\SmartyExtensionInterface;
 
 /**
  * Class ProductExtension
  * @package Root\view\SmartyExtensions
  */
-class ProductExtension extends BaseExtension implements SmartyExtensionInterface
+class ProductExtension extends SmartyExtension implements SmartyExtensionInterface
 {
     public function register()
     {
