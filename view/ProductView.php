@@ -2,7 +2,6 @@
 
 namespace Root\view;
 
-use Root\api\facades\Pages;
 use Root\api\Simpla;
 
 /**
