@@ -19,7 +19,7 @@ class ProductView extends View
 {
 
 	function fetch()
-	{   
+	{
 		//$product_url = $this->request->get('product_url', 'string');
         //$product_url = request()->get('product_url', 'string');
         //$product_url = Simpla::$container->request->get('product_url', 'string');

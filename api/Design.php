@@ -45,6 +45,8 @@ class Design
 		if(!is_dir($this->smarty->compile_dir)) {
 			mkdir($this->smarty->compile_dir, 0777);
         }
+
+        $this->smarty->addPluginsDir()
 						
 		$this->smarty->cache_dir = 'cache';
 
@@ -61,6 +63,7 @@ class Design
 	public function fetch($template)
 	{
 		// Передаем в дизайн то, что может понадобиться в нем
+		$this->assign('api',		$this);
 		$this->assign('config',		$this->config);
 		$this->assign('settings',	$this->settings);
 		return $this->smarty->fetch($template);

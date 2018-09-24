@@ -44,6 +44,18 @@ class ProductsWith
         return $this;
     }
 
+    public function comments()
+    {
+        // ...
+        return $this;
+    }
+
+    public function features()
+    {
+        // ..
+        return $this;
+    }
+
     public function get()
     {
         foreach($this->products as $id => $product)
