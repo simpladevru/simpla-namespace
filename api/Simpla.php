@@ -42,7 +42,7 @@ use Root\helpers\Debug;
  * @property Notify $notify
  * @property Managers $managers
  */
-class Simpla
+class Simpla extends Container
 {
     /** @var Container */
     public static $container;
@@ -69,7 +69,7 @@ class Simpla
 
     public function set_container()
     {
-        static::$container = new Container();
+        static::$container = $this;
     }
 
     private function register_services()
