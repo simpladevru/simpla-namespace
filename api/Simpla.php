@@ -11,6 +11,7 @@ use Root\api\components\settings\StorageSettingInterface;
 use Root\api\components\cart\base\Cart;
 use Root\api\components\cart\base\CartStorageInterface;
 use Root\api\components\cart\base\CartSessionStorage;
+use Root\helpers\Debug;
 
 /**
  * Class Simpla
@@ -51,6 +52,10 @@ class Simpla
 
     public function __construct()
     {
+        $this->set_container();
+        $this->register_services();
+        $this->register_storage();
+
         static::$instance = $this;
     }
 

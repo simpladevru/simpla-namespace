@@ -9,6 +9,7 @@
 namespace Root\api\components\design\smarty;
 
 use Root\api\Simpla;
+use Root\helpers\Debug;
 
 /**
  * Class RegisterSmartyExtension
