@@ -6,7 +6,7 @@
  * Time: 15:16
  */
 
-namespace api\facades;
+namespace Root\api\facades;
 
 use Root\api\components\facade\Facade;
 
