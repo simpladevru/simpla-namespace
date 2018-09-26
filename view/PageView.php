@@ -1,9 +1,8 @@
 <?PHP
 
 namespace Root\view;
-use Root\api\facades\Pages;
+
 use Root\api\Simpla;
-use Root\helpers\Debug;
 
 /**
  * Simpla CMS
@@ -27,7 +26,7 @@ class PageView extends View
 
         $page = Simpla::getInstance()->pages->get_page($url);
 
-		// Отображать скрытые страницы только админу
+        // Отображать скрытые страницы только админу
 		if(empty($page) || (!$page->visible && empty($_SESSION['admin']))) {
 			return false;
         }

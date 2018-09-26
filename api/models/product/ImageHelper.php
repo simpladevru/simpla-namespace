@@ -8,6 +8,7 @@
 
 namespace Root\api\models\product;
 
+use Root\api\Config;
 use Root\api\Simpla;
 
 class ImageHelper
@@ -23,9 +24,12 @@ class ImageHelper
 
         $resized_filename_encoded = rawurlencode($resized_filename_encoded);
 
-        return Simpla::$container->config->root_url .'/'.
-            Simpla::$container->config->resized_images_dir .
+        /** @var Config $config */
+        $config = Simpla::$container->config;
+
+        return $config->root_url .'/'.
+            $config->resized_images_dir .
             $resized_filename_encoded .'?'.
-            Simpla::$container->config->token($resized_filename);
+            $config->token($resized_filename);
     }
 }

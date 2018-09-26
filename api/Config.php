@@ -11,12 +11,20 @@ namespace Root\api;
  * @link 		http://simplacms.ru
  * @author 		Denis Pikusov
  *
+ * @property $protocol
+ * @property $root_url
+ * @property $subfolder
+ * @property $root_dir
+ * @property $max_upload_filesize
+ * @property $php_timezone
+ * @property $salt
+ *
  */
 
 class Config
 {
 	public $version = '2.3.8';
-	
+
 	// Файл для хранения настроек
 	public $config_file = 'config/config.php';
 
