@@ -1,0 +1,16 @@
+FROM php:7.2-apache
+
+RUN apt-get clean
+RUN apt-get update
+RUN apt-get install -y libpq-dev unzip libzip-dev
+RUN pecl install redis
+RUN docker-php-ext-enable redis
+RUN docker-php-ext-install pdo pdo_mysql mysqli zip
+
+RUN curl -sS https://getcomposer.org/installer | php -- \
+  --install-dir=/usr/bin --filename=composer
+
+RUN a2enmod rewrite
+RUN service apache2 restart
+
+WORKDIR /var/www/html

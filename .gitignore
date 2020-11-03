@@ -4,3 +4,4 @@
 composer.phar
 /files/products/*
 /config/config.php
+/docker/mysql/*

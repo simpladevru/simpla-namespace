@@ -1,0 +1,37 @@
+version: '3'
+services:
+  php:
+    build:
+      context: ./
+      dockerfile: docker/php.docker
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - "DB_PORT=3306"
+      - "DB_HOST=mysql"
+      - "REDIS_PORT=6379"
+      - "REDIS_HOST=redis"
+    ports:
+      - 81:80
+  redis:
+    image: redis:3.0
+    ports:
+      - "63792:6379"
+  mysql:
+    image: 'mysql:5.7'
+    volumes:
+      - './docker/mysql:/var/lib/mysql'
+      - ./simpla/update/simpla.sql:/docker-entrypoint-initdb.d/dump.sql
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=secret
+      - MYSQL_DATABASE=app
+    ports:
+      - '33062:3306'
+  node:
+    image: node:8.6-alpine
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    tty: true
