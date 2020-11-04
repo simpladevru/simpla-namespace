@@ -17,8 +17,7 @@ class Cart
     private Variants $variants;
     private Coupons $coupons;
 
-    /** @var array|Purchase  */
-    private array $purchases = [];
+    private ?Collection $purchases = null;
     private ?stdClass $coupon = null;
 
     /**
@@ -45,9 +44,7 @@ class Cart
      */
     public function get_total_price()
     {
-        return array_sum(array_map(function (Purchase $purchase) {
-            return $purchase->get_cost();
-        }, $this->get_purchases()));
+        return$this->get_purchases()->sum(fn (Purchase $purchase) => $purchase->get_cost());
     }
 
     /**
@@ -55,9 +52,7 @@ class Cart
      */
     public function get_total_products()
     {
-        return array_sum(array_map(function (Purchase $purchase) {
-            return $purchase->get_amount();
-        }, $this->get_purchases()));
+        return$this->get_purchases()->sum(fn (Purchase $purchase) => $purchase->get_amount());
     }
 
     /**
@@ -89,32 +84,12 @@ class Cart
     }
 
     /**
-     * @return bool
-     */
-    public function has_purchases(): bool
-    {
-        return count($this->load_items()) > 0;
-    }
-
-    /**
-     * @return array
-     */
-    public function get_purchases(): array
-    {
-        return $this->load_items();
-    }
-
-    /**
      * @param int $variant_id
-     * @return Purchase
+     * @return Purchase|null
      */
-    public function get_purchase(int $variant_id): Purchase
+    public function get_purchase(int $variant_id): ?Purchase
     {
-        if (!$this->has_purchase($variant_id)) {
-            throw new DomainException('purchase not found');
-        }
-
-        return $this->purchases[$variant_id];
+        return $this->get_purchases()->get($variant_id, null);
     }
 
     /**
@@ -123,7 +98,23 @@ class Cart
      */
     public function has_purchase(int $variant_id): bool
     {
-        return !empty($this->load_items()[$variant_id]);
+        return $this->get_purchases()->has($variant_id);
+    }
+
+    /**
+     * @return bool
+     */
+    public function has_purchases(): bool
+    {
+        return $this->get_purchases()->isNotEmpty();
+    }
+
+    /**
+     * @return Collection
+     */
+    public function get_purchases(): Collection
+    {
+        return $this->load_items();
     }
 
     /**
@@ -135,12 +126,11 @@ class Cart
         $amount = max(1, $amount);
 
         if ($this->has_purchase($variant_id)) {
-            $purchase = $this->get_purchase($variant_id);
-            $purchase->add_amount($amount);
+            $this->get_purchase($variant_id)->add_amount($amount);
         } else {
             $variant = $this->get_variant_by_id((int) $variant_id);
             $product = $this->get_product_by_id((int) $variant->product_id);
-            $this->purchases[$variant_id] = new Purchase($product, $variant, $amount);
+            $this->purchases->put($variant_id, new Purchase($product, $variant, $amount));
         }
     }
 
@@ -150,9 +140,7 @@ class Cart
      */
     public function update_purchase(int $variant_id, int $amount = 1): void
     {
-        if ($this->has_purchase($variant_id)) {
-            $this->get_purchase($variant_id)->update_amount(max(1, $amount));
-        }
+        $this->get_purchase($variant_id)->update_amount(max(1, $amount));
     }
 
     /**
@@ -160,24 +148,24 @@ class Cart
      */
     public function delete_purchase(int $variant_id): void
     {
-        if ($this->has_purchase($variant_id)) {
-            unset($this->purchases[$variant_id]);
-        }
+        $this->purchases->forget($variant_id);
     }
 
     public function empty_cart(): void
     {
-        $this->purchases = [];
+        $this->purchases = null;
     }
 
     public function save(): void
     {
-        $this->storage->save_items(array_map(function (Purchase $purchase) {
-            return [
-                'variant_id' => $purchase->get_id(),
-                'amount'     => $purchase->get_amount(),
-            ];
-        }, $this->get_purchases()));
+        $this->storage->save_items(
+            $this->get_purchases()->map(function (Purchase $purchase) {
+                return [
+                    'variant_id' => $purchase->get_id(),
+                    'amount'     => $purchase->get_amount(),
+                ];
+            })->all()
+        );
     }
 
     /**
@@ -192,6 +180,32 @@ class Cart
         } else {
             $this->storage->remove_coupon_code();
         }
+    }
+
+    /**
+     * @return Collection
+     */
+    private function load_items(): Collection
+    {
+        $this->purchases = $this->purchases ?? new Collection();
+
+        if ($this->purchases->isEmpty() && $this->storage->has_items()) {
+            $storage_items = $this->storage->get_items();
+
+            $variants = array_column($this->variants->get_variants(['id' => array_keys($storage_items)]), null, 'id');
+            $products = array_column($this->products->get_products(['id' => array_column($variants, 'product_id')]), null, 'id');
+            $images   = (new Collection($this->products->get_images(['product_id' => array_column($products, 'id')])))->groupBy('product_id');
+
+            foreach (array_intersect_key($storage_items, $variants) as $storage_item) {
+                $variant         = $variants[$storage_item['variant_id']];
+                $product         = $products[$variant->product_id];
+                $product->images = $images->get($product->id, []);
+
+                $this->purchases->put($variant->id, new Purchase($product, $variant, $storage_item['amount']));
+            }
+        }
+
+        return $this->purchases;
     }
 
     /**
@@ -224,29 +238,5 @@ class Cart
         }
 
         return $variant;
-    }
-
-    /**
-     * @return array
-     */
-    private function load_items(): array
-    {
-        if (!$this->purchases && $this->storage->has_items()) {
-            $storage_items = $this->storage->get_items();
-
-            $variants = array_column($this->variants->get_variants(['id' => array_keys($storage_items)]), null, 'id');
-            $products = array_column($this->products->get_products(['id' => array_column($variants, 'product_id')]), null, 'id');
-            $images   = (new Collection($this->products->get_images(['product_id' => array_column($products, 'id')])))->groupBy('product_id');
-
-            foreach (array_intersect_key($storage_items, $variants) as $storage_item) {
-                $variant         = $variants[$storage_item['variant_id']];
-                $product         = $products[$variant->product_id];
-                $product->images = $images->get($product->id, []);
-
-                $this->purchases[$variant->id] = new Purchase($product, $variant, $storage_item['amount']);
-            }
-        }
-
-        return $this->purchases;
     }
 }
