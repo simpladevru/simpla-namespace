@@ -16,7 +16,6 @@ class Cart
     private Products $products;
     private Variants $variants;
     private Coupons $coupons;
-
     private ?Collection $purchases = null;
     private ?stdClass $coupon = null;
 
@@ -31,8 +30,7 @@ class Cart
         Products $products,
         Variants $variants,
         Coupons $coupons
-    )
-    {
+    ) {
         $this->storage  = $storage;
         $this->products = $products;
         $this->variants = $variants;
@@ -44,7 +42,7 @@ class Cart
      */
     public function get_total_price()
     {
-        return$this->get_purchases()->sum(fn (Purchase $purchase) => $purchase->get_cost());
+        return $this->get_purchases()->sum(fn(Purchase $purchase) => $purchase->get_cost());
     }
 
     /**
@@ -52,7 +50,7 @@ class Cart
      */
     public function get_total_products()
     {
-        return$this->get_purchases()->sum(fn (Purchase $purchase) => $purchase->get_amount());
+        return $this->get_purchases()->sum(fn(Purchase $purchase) => $purchase->get_amount());
     }
 
     /**
@@ -60,7 +58,7 @@ class Cart
      */
     public function get_coupon(): ?stdClass
     {
-        if(!$this->coupon && $this->storage->has_coupon_code() ) {
+        if (!$this->coupon && $this->storage->has_coupon_code()) {
             $this->coupon = $this->coupons->get_coupon($this->storage->get_coupon_code());
         }
 
@@ -192,9 +190,14 @@ class Cart
         if ($this->purchases->isEmpty() && $this->storage->has_items()) {
             $storage_items = $this->storage->get_items();
 
-            $variants = new Collection(array_column($this->variants->get_variants(['id' => array_keys($storage_items)]), null, 'id'));
-            $products = new Collection(array_column($this->products->get_products(['id' => array_column($variants, 'product_id')]), null, 'id'));
-            $images   = (new Collection($this->products->get_images(['product_id' => array_column($products, 'id')])))->groupBy('product_id');
+            $variants = new Collection(array_column($this->variants->get_variants(['id' => array_keys($storage_items)]),
+                null, 'id'));
+            $products = new Collection(array_column($this->products->get_products([
+                'id' => array_column($variants, 'product_id'),
+            ]), null, 'id'));
+            $images   = (new Collection($this->products->get_images([
+                'product_id' => array_column($products, 'id'),
+            ])))->groupBy('product_id');
 
             foreach (array_intersect_key($storage_items, $variants) as $storage_item) {
                 $variant         = $variants->get($storage_item['variant_id']);
