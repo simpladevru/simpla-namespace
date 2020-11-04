@@ -46,7 +46,7 @@ class Cart
     public function get_total_price()
     {
         return array_sum(array_map(function (Purchase $purchase) {
-            return $purchase->get_variant()->price * $purchase->get_amount();
+            return $purchase->get_cost();
         }, $this->get_purchases()));
     }
 
