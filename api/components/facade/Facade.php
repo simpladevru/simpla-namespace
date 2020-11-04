@@ -16,7 +16,7 @@ class Facade
     {
         $instance = Simpla::$container->{static::getFacadeAccessor()};
 
-        if (! $instance) {
+        if (!$instance) {
             throw new \Exception('A facade root has not been set.');
         }
 

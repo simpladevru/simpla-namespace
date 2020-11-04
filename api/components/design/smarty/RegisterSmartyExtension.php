@@ -13,6 +13,7 @@ use Root\helpers\Debug;
 
 /**
  * Class RegisterSmartyExtension
+ *
  * @package Root\api\components\design\smarty
  */
 class RegisterSmartyExtension
@@ -23,13 +24,13 @@ class RegisterSmartyExtension
      */
     public static function add($extension)
     {
-        if(! class_exists($extension) ) {
+        if (!class_exists($extension)) {
             return false;
         }
 
         $extension = new $extension(Simpla::$container);
 
-        if(! $extension instanceof SmartyExtensionInterface ) {
+        if (!$extension instanceof SmartyExtensionInterface) {
             throw new BadSmartyExtensionException();
         }
 

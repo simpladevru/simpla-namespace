@@ -1,12 +1,14 @@
 <?php
 
 namespace Root\api;
+
 use ArrayAccess;
 use ReflectionClass;
 use Root\helpers\Debug;
 
 /**
  * Class Container
+ *
  * @package Root\api
  */
 class Container implements ArrayAccess
@@ -36,7 +38,6 @@ class Container implements ArrayAccess
      */
     public function __construct()
     {
-
     }
 
     /**
@@ -46,9 +47,9 @@ class Container implements ArrayAccess
      */
     public function addInstance(string $name, $service, bool $share = true)
     {
-        $this->services[$name] = $service;
+        $this->services[$name]     = $service;
         $this->instantiated[$name] = $service;
-        $this->shared[$name] = $share;
+        $this->shared[$name]       = $share;
     }
 
     /**
@@ -59,16 +60,16 @@ class Container implements ArrayAccess
      */
     public function set(string $name, $value = null, bool $share = true)
     {
-        if(! is_string($name) ) {
+        if (!is_string($name)) {
             throw new \Exception('Container wrong name');
         }
 
-        if( is_null($value) && class_exists($name) ) {
+        if (is_null($value) && class_exists($name)) {
             $value = $name;
         }
 
         $this->services[$name] = $value;
-        $this->shared[$name] = $share;
+        $this->shared[$name]   = $share;
     }
 
     /**
@@ -97,9 +98,9 @@ class Container implements ArrayAccess
      */
     public function has(string $name): bool
     {
-        return isset($this->services[$name]) ||
-               isset($this->instantiated[$name]) ||
-               $this->is_alias($name);
+        return isset($this->services[$name])
+            || isset($this->instantiated[$name])
+            || $this->is_alias($name);
     }
 
     /**
@@ -117,20 +118,18 @@ class Container implements ArrayAccess
 
         $service = $this->get_service($name);
 
-        if( is_string($service) && class_exists($service) ) {
+        if (is_string($service) && class_exists($service)) {
             $object = $this->build_object($service);
-        }
-        else if( is_array($service) && class_exists($obj = reset($service)) ) {
+        } elseif (is_array($service) && class_exists($obj = reset($service))) {
             $params = array_slice($service, 1);
             $object = $this->build_object($obj, $params);
-        }
-        else if ( $service instanceof \Closure ) {
+        } elseif ($service instanceof \Closure) {
             $object = $service($this);
-        } else if ( is_string($service) || is_array($service) ) {
+        } elseif (is_string($service) || is_array($service)) {
             $object = $service;
         }
 
-        if ( !empty($this->shared[$name]) ) {
+        if (!empty($this->shared[$name])) {
             $this->instantiated[$name] = $object;
         }
 
@@ -146,13 +145,12 @@ class Container implements ArrayAccess
     {
         $name = $this->get_alias($name);
 
-        if( !empty($this->services[$name]) ) {
+        if (!empty($this->services[$name])) {
             return $this->services[$name];
         }
 
         throw new \Exception('No service ' . $name);
     }
-
 
     /**
      * @param string $name
@@ -164,7 +162,7 @@ class Container implements ArrayAccess
     {
         $reflector = new ReflectionClass($name);
 
-        if (! $reflector->isInstantiable() ) {
+        if (!$reflector->isInstantiable()) {
             return $name;
         }
 
@@ -177,17 +175,17 @@ class Container implements ArrayAccess
         $parameters = $constructor->getParameters();
 
         $arguments = [];
-        foreach($parameters as $param) {
-            if( $class = $param->getClass() ) {
+        foreach ($parameters as $param) {
+            if ($class = $param->getClass()) {
                 $className = $class->getName();
-                if(! ($this->has($className)) ) {
+                if (!($this->has($className))) {
                     $this->set($className, $className);
                 }
                 $arguments[] = $this->get($className);
-            } elseif ( $param->isArray() ) {
+            } elseif ($param->isArray()) {
                 $arguments[] = [];
             } else {
-                if( $param->isDefaultValueAvailable() ) {
+                if ($param->isDefaultValueAvailable()) {
                     throw new \Exception('Unable to resolve ' . $param->getName() . ' in service ' . $name);
                 }
                 $arguments[] = $param->isDefaultValueAvailable();
@@ -218,7 +216,7 @@ class Container implements ArrayAccess
         $this->unset($this->shared[$name]);
         $this->unset($this->aliases[$name]);
 
-        if( ($alias = $this->get_alias($name)) ) {
+        if (($alias = $this->get_alias($name))) {
             $this->unset($alias);
         }
     }
@@ -229,7 +227,7 @@ class Container implements ArrayAccess
      */
     public function set_alias($abstract, $alias)
     {
-        if( !$abstract || !$alias ) {
+        if (!$abstract || !$alias) {
             return;
         }
         $this->aliases[$alias] = $abstract;
@@ -242,11 +240,11 @@ class Container implements ArrayAccess
      */
     public function get_alias($abstract)
     {
-        if (! isset($this->aliases[$abstract]) ) {
+        if (!isset($this->aliases[$abstract])) {
             return $abstract;
         }
 
-        if ( $this->aliases[$abstract] === $abstract ) {
+        if ($this->aliases[$abstract] === $abstract) {
             throw new \Exception("[{$abstract}] is aliased to itself.");
         }
 

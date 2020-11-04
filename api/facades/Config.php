@@ -12,12 +12,13 @@ use Root\api\components\facade\Facade;
 
 /**
  * Class Config
+ *
  * @package api\facades
  *
  * @method static token($text)
  * @method static check_token($text, $token)
  *
- *  @see \Root\api\Config
+ * @see     \Root\api\Config
  */
 class Config extends Facade
 {

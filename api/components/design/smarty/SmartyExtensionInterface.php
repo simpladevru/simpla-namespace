@@ -10,10 +10,12 @@ namespace Root\api\components\design\smarty;
 
 /**
  * Interface SmartyExtensionInterface
+ *
  * @package Root\api\components\design\smarty
  */
 interface SmartyExtensionInterface
 {
     public function __construct($container);
+
     public function register();
 }

@@ -12,17 +12,18 @@ use Root\api\components\facade\Facade;
 
 /**
  * Class Pages
+ *
  * @package Root\api\facades
  *
  * @method static get_page($id)
- * @method static get_pages($filter = array())
+ * @method static get_pages($filter = [])
  * @method static add_page($page)
  * @method static update_page($id, $page)
  * @method static delete_page($id)
  * @method static get_menus()
  * @method static get_menu($menu_id)
  *
- * @see \Root\api\Pages
+ * @see     \Root\api\Pages
  */
 class Pages extends Facade
 {

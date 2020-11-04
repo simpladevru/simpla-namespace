@@ -7,10 +7,12 @@
  */
 
 namespace Root\api\components\design\smarty;
+
 use Root\api\Container;
 
 /**
  * Class SmartyExtension
+ *
  * @package Root\api\components\design\smarty
  *
  * @property \Smarty $smarty
@@ -22,11 +24,12 @@ abstract class SmartyExtension
 
     /**
      * SmartyExtension constructor.
+     *
      * @param Container $container
      */
     public function __construct($container)
     {
-        if(! $container->has('design') || empty($container->design->smarty) ) {
+        if (!$container->has('design') || empty($container->design->smarty)) {
             throw new BadSmartyExtensionException();
         }
         $this->smarty = $container->design->smarty;

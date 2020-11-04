@@ -10,13 +10,21 @@ class Query
     private $connection;
 
     private $columns = [];
-    private $from   = [];
-    private $where  = [];
-    private $join   = [];
-    private $group  = [];
-    private $order  = [];
-    private $limit  = [];
-    private $offset = [];
+
+    private $from    = [];
+
+    private $where   = [];
+
+    private $join    = [];
+
+    private $group   = [];
+
+    private $order   = [];
+
+    private $limit   = [];
+
+    private $offset  = [];
+
     private $alias;
 
     public function __construct(Database $connection)
@@ -94,22 +102,22 @@ class Query
 
     public function __toString()
     {
-        $sql  = $this->connection->placehold('SELECT ' . join(', ', $this->columns));
+        $sql = $this->connection->placehold('SELECT ' . join(', ', $this->columns));
         $sql .= $this->connection->placehold(' FROM ' . join(', ', $this->from));
 
-        if( !empty($this->where) ) {
+        if (!empty($this->where)) {
             $sql .= ' WHERE';
-            foreach( $this->where as $i => $where ) {
-                $sql .= ( ($i>0) ? ' ' . $where['cnd'] . ' ' : ' ' )
+            foreach ($this->where as $i => $where) {
+                $sql .= (($i > 0) ? ' ' . $where['cnd'] . ' ' : ' ')
                     . $this->connection->placehold($where['query'], ...$where['params']);
             }
         }
 
-        if( !empty($this->limit) ) {
+        if (!empty($this->limit)) {
             $sql .= $this->connection->placehold(' LIMIT ?', $this->limit);
         }
 
-        if( !empty($this->offset) ) {
+        if (!empty($this->offset)) {
             $sql .= $this->connection->placehold(' OFFSET ?', $this->offset);
         }
 
@@ -119,7 +127,7 @@ class Query
     public function execute()
     {
         $query = (string) $this;
-        if(! $this->connection->query( $query ) )  {
+        if (!$this->connection->query($query)) {
             new \Exception('Wrong query sql ' . $query);
         }
         $this->execute = true;
@@ -138,6 +146,6 @@ class Query
 
     public function count($field = '*')
     {
-      //  return $this->connection->results($field);
+        //  return $this->connection->results($field);
     }
 }

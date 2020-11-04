@@ -1,9 +1,9 @@
 {* Информера корзины (отдаётся аяксом) *}
 
-{if $cart->total_products>0}
+{if $cart->has_purchases()}
 	В <a href="./cart/">корзине</a>
-	{$cart->total_products} {$cart->total_products|plural:'товар':'товаров':'товара'}
-	на {$cart->total_price|convert} {$currency->sign|escape}
+	{$cart->get_total_products()} {$cart->get_total_products()|plural:'товар':'товаров':'товара'}
+	на {$cart->get_total_price()|convert} {$currency->sign|escape}
 {else}
 	Корзина пуста
 {/if}

@@ -11,7 +11,7 @@ use Root\api\components\settings\StorageSettingInterface;
 use Root\api\components\cart\base\Cart;
 use Root\api\components\cart\base\CartStorageInterface;
 use Root\api\components\cart\base\CartSessionStorage;
-use Root\helpers\Debug;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class Simpla
@@ -41,6 +41,7 @@ use Root\helpers\Debug;
  * @property Feedbacks $feedbacks
  * @property Notify $notify
  * @property Managers $managers
+ * @property Filesystem $filesystem
  */
 class Simpla extends Container
 {
@@ -99,6 +100,7 @@ class Simpla extends Container
         return [
             'config'     => Config::class,
             'settings'   => Settings::class,
+            'filesystem' => Filesystem::class,
 
             'db'         => Database::class,
 
