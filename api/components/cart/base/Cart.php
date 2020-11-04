@@ -148,7 +148,7 @@ class Cart
      */
     public function delete_purchase(int $variant_id): void
     {
-        $this->purchases->forget($variant_id);
+        $this->get_purchases()->forget($variant_id);
     }
 
     public function empty_cart(): void
