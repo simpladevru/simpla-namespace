@@ -190,14 +190,9 @@ class Cart
         if ($this->purchases->isEmpty() && $this->storage->has_items()) {
             $storage_items = $this->storage->get_items();
 
-            $variants = new Collection(array_column($this->variants->get_variants(['id' => array_keys($storage_items)]),
-                null, 'id'));
-            $products = new Collection(array_column($this->products->get_products([
-                'id' => array_column($variants, 'product_id'),
-            ]), null, 'id'));
-            $images   = (new Collection($this->products->get_images([
-                'product_id' => array_column($products, 'id'),
-            ])))->groupBy('product_id');
+            $variants = new Collection(array_column($this->variants->get_variants(['id' => array_keys($storage_items)]), null, 'id'));
+            $products = new Collection(array_column($this->products->get_products(['id' => array_column($variants, 'product_id')]), null, 'id'));
+            $images   = (new Collection($this->products->get_images(['product_id' => array_column($products, 'id'),])))->groupBy('product_id');
 
             foreach (array_intersect_key($storage_items, $variants) as $storage_item) {
                 $variant         = $variants->get($storage_item['variant_id']);
