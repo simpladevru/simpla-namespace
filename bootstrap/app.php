@@ -8,7 +8,7 @@ if( !function_exists('simpla') )
 {
     /**
      * @param null $api
-     * @return array|mixed|object|\Root\api\Container|string
+     * @return \Root\api\Simpla|\Root\api\Container
      * @throws ReflectionException
      */
     function simpla($api = null)

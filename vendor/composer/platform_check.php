@@ -9,9 +9,16 @@ if (!(PHP_VERSION_ID >= 70300)) {
 }
 
 $missingExtensions = array();
+extension_loaded('dom') || $missingExtensions[] = 'dom';
+extension_loaded('filter') || $missingExtensions[] = 'filter';
 extension_loaded('json') || $missingExtensions[] = 'json';
+extension_loaded('libxml') || $missingExtensions[] = 'libxml';
 extension_loaded('mbstring') || $missingExtensions[] = 'mbstring';
 extension_loaded('mysqli') || $missingExtensions[] = 'mysqli';
+extension_loaded('phar') || $missingExtensions[] = 'phar';
+extension_loaded('tokenizer') || $missingExtensions[] = 'tokenizer';
+extension_loaded('xml') || $missingExtensions[] = 'xml';
+extension_loaded('xmlwriter') || $missingExtensions[] = 'xmlwriter';
 
 if ($missingExtensions) {
     $issues[] = 'Your Composer dependencies require the following PHP extensions to be installed: ' . implode(', ', $missingExtensions);
