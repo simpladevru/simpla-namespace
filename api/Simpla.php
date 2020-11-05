@@ -20,6 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * * @property Config $config
  * @property Request $request
  * @property Database $db
+ * @property DatabaseIlluminate $dbi;
  * @property Settings $settings
  * @property Design $design
  * @property Products $products
@@ -103,6 +104,7 @@ class Simpla extends Container
             'filesystem' => Filesystem::class,
 
             'db'         => Database::class,
+            'dbl'        => DatabaseIlluminate::class,
 
             'session'    => Session::class,
             'request'    => Request::class,

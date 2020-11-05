@@ -3,38 +3,22 @@
 namespace Root\api\components\cart\base;
 
 use Api\components\cart\base\Purchase;
-use DomainException;
+use Api\entities\shop\catalog\Variant;
 use Illuminate\Support\Collection;
-use Root\api\Coupons;
-use Root\api\Products;
-use Root\api\Variants;
-use stdClass;
+use Root\api\DatabaseIlluminate;
 
 class Cart
 {
     private CartStorageInterface $storage;
-    private Products $products;
-    private Variants $variants;
-    private Coupons $coupons;
-    private ?Collection $purchases = null;
-    private ?stdClass $coupon = null;
+    private ?Collection          $purchases = null;
 
     /**
      * @param CartStorageInterface $storage
-     * @param Products $products
-     * @param Variants $variants
-     * @param Coupons $coupons
+     * @param DatabaseIlluminate $dbl
      */
-    public function __construct(
-        CartStorageInterface $storage,
-        Products $products,
-        Variants $variants,
-        Coupons $coupons
-    ) {
+    public function __construct(CartStorageInterface $storage, DatabaseIlluminate $dbl)
+    {
         $this->storage  = $storage;
-        $this->products = $products;
-        $this->variants = $variants;
-        $this->coupons  = $coupons;
     }
 
     /**
@@ -51,34 +35,6 @@ class Cart
     public function get_total_products()
     {
         return $this->get_purchases()->sum(fn(Purchase $purchase) => $purchase->get_amount());
-    }
-
-    /**
-     * @return stdClass|null
-     */
-    public function get_coupon(): ?stdClass
-    {
-        if (!$this->coupon && $this->storage->has_coupon_code()) {
-            $this->coupon = $this->coupons->get_coupon($this->storage->get_coupon_code());
-        }
-
-        return $this->coupon;
-    }
-
-    /**
-     * @return int
-     */
-    public function get_discount()
-    {
-        return 0;
-    }
-
-    /**
-     * @return int
-     */
-    public function get_coupon_discount()
-    {
-        return 0;
     }
 
     /**
@@ -126,9 +82,7 @@ class Cart
         if ($this->has_purchase($variant_id)) {
             $this->get_purchase($variant_id)->add_amount($amount);
         } else {
-            $variant = $this->get_variant_by_id((int) $variant_id);
-            $product = $this->get_product_by_id((int) $variant->product_id);
-            $this->purchases->put($variant_id, new Purchase($product, $variant, $amount));
+            $this->purchases->put($variant_id, new Purchase(Variant::findOrFail($variant_id), (int) $amount));
         }
     }
 
@@ -167,20 +121,6 @@ class Cart
     }
 
     /**
-     * @param string $coupon_code
-     */
-    public function apply_coupon(string $coupon_code): void
-    {
-        $coupon = $this->coupons->get_coupon($coupon_code);
-
-        if ($coupon && $coupon->valid) {
-            $this->storage->save_coupon_code($coupon->code);
-        } else {
-            $this->storage->remove_coupon_code();
-        }
-    }
-
-    /**
      * @return Collection
      */
     private function load_items(): Collection
@@ -190,51 +130,17 @@ class Cart
         if ($this->purchases->isEmpty() && $this->storage->has_items()) {
             $storage_items = $this->storage->get_items();
 
-            $variants = new Collection(array_column($this->variants->get_variants(['id' => array_keys($storage_items)]), null, 'id'));
-            $products = new Collection(array_column($this->products->get_products(['id' => array_column($variants, 'product_id')]), null, 'id'));
-            $images   = (new Collection($this->products->get_images(['product_id' => array_column($products, 'id'),])))->groupBy('product_id');
+            $variants = Variant::query()
+                ->whereIn('id', array_keys($storage_items))
+                ->with(['product', 'product.images'])
+                ->get()->groupBy('id');
 
-            foreach (array_intersect_key($storage_items, $variants) as $storage_item) {
-                $variant         = $variants->get($storage_item['variant_id']);
-                $product         = $products->get($variant->product_id);
-                $product->images = $images->get($product->id, []);
-
-                $this->purchases->put($variant->id, new Purchase($product, $variant, $storage_item['amount']));
+            foreach ($storage_items as $storage_item) {
+                $variant = $variants->get($storage_item['variant_id'])->first();
+                $this->purchases->put($variant->id, new Purchase($variant, (int) $storage_item['amount']));
             }
         }
 
         return $this->purchases;
-    }
-
-    /**
-     * @param int $product_id
-     * @return stdClass
-     */
-    private function get_product_by_id(int $product_id): stdClass
-    {
-        /** @var stdClass $product */
-        $product = $this->products->get_product($product_id);
-
-        if (!$product) {
-            throw new DomainException('product not found');
-        }
-
-        return $product;
-    }
-
-    /**
-     * @param int $variant_id
-     * @return stdClass
-     */
-    private function get_variant_by_id(int $variant_id): stdClass
-    {
-        /** @var stdClass $variant */
-        $variant = $this->variants->get_variant($variant_id);
-
-        if (!$variant) {
-            throw new DomainException('variant not found');
-        }
-
-        return $variant;
     }
 }

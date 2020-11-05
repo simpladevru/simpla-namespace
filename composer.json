@@ -14,7 +14,8 @@
         "ext-mysqli": "*",
         "symfony/var-dumper": "^5.1",
         "symfony/filesystem": "^5.1",
-        "illuminate/collections": "^8.13"
+        "illuminate/collections": "^8.13",
+        "illuminate/database": "^8.13"
     },
     "autoload": {
         "psr-4": {

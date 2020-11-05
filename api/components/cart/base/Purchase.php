@@ -2,22 +2,22 @@
 
 namespace Api\components\cart\base;
 
-use stdClass;
+use Api\entities\shop\catalog\Product;
+use Api\entities\shop\catalog\Variant;
 
 class Purchase
 {
-    private stdClass $product;
-    private stdClass $variant;
+    private Product $product;
+    private Variant $variant;
     private int      $amount;
 
     /**
-     * @param stdClass $product
-     * @param stdClass $variant
+     * @param Variant $variant
      * @param int $amount
      */
-    public function __construct(stdClass $product, stdClass $variant, int $amount)
+    public function __construct(Variant $variant, int $amount)
     {
-        $this->product = $product;
+        $this->product = $variant->product;
         $this->variant = $variant;
         $this->amount  = $amount;
     }
@@ -31,17 +31,17 @@ class Purchase
     }
 
     /**
-     * @return stdClass
+     * @return Product
      */
-    public function get_product(): stdClass
+    public function get_product(): Product
     {
         return $this->product;
     }
 
     /**
-     * @return stdClass
+     * @return Variant
      */
-    public function get_variant(): stdClass
+    public function get_variant(): Variant
     {
         return $this->variant;
     }
