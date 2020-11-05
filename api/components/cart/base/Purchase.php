@@ -18,7 +18,7 @@ class Purchase
     public function __construct(Variant $variant, int $amount)
     {
         $this->variant = $variant;
-        $this->amount  = max(1, $amount);
+        $this->update_amount($amount);
     }
 
     /**
@@ -82,7 +82,7 @@ class Purchase
      */
     public function update_amount(int $amount)
     {
-        $this->amount = $this->variant->getAvailableStockByAmount($amount);
+        $this->amount = $this->variant->getAvailableStockByAmount(max(1, $amount));
     }
 
     /**
@@ -90,6 +90,6 @@ class Purchase
      */
     public function add_amount(int $amount)
     {
-        $this->update_amount(max(1, $amount) + $this->amount);
+        $this->update_amount($amount + $this->amount);
     }
 }
