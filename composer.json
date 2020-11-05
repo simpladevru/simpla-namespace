@@ -16,7 +16,8 @@
         "symfony/filesystem": "^5.1",
         "illuminate/collections": "^8.13",
         "illuminate/database": "^8.13",
-        "fzaninotto/faker": "^1.9"
+        "fzaninotto/faker": "^1.9",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {

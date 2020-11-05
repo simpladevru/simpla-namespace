@@ -54,16 +54,34 @@ class Design
         }
     }
 
-    public function assign($var, $value)
+    /**
+     * @param $var
+     * @param $value
+     * @return Smarty
+     */
+    public function assign($var, $value): Smarty
     {
+        if (is_array($var) && !$value) {
+            foreach ($var as $key => $value) {
+                $this->assign($key, $value);
+            }
+
+            return $this->smarty;
+        }
+
         return $this->smarty->assign($var, $value);
     }
 
-    public function fetch($template)
+    public function fetch($template, array $vars = [])
     {
+        foreach ($vars as $key => $var) {
+            $this->assign($key, $var);
+        }
+
         // Передаем в дизайн то, что может понадобиться в нем
         $this->assign('config', $this->config);
         $this->assign('settings', $this->settings);
+
         return $this->smarty->fetch($template);
     }
 
