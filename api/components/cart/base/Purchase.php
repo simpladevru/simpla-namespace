@@ -67,7 +67,7 @@ class Purchase
      */
     public function get_cost(): int
     {
-        return $this->amount * $this->get_price();
+        return $this->get_amount() * $this->get_price();
     }
 
     /**
