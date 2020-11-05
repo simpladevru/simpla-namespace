@@ -90,7 +90,7 @@ class Cart
      */
     public function update_purchase(int $variant_id, int $amount = 1): void
     {
-        $this->get_purchase($variant_id)->change_amount(max(1, $amount));
+        $this->get_purchase($variant_id)->change_amount($amount);
     }
 
     /**
