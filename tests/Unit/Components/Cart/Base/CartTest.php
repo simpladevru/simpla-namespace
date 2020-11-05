@@ -93,4 +93,21 @@ class CartTest extends TestCase
 
         $this->assertEquals($cart->get_total_products(), $amount2);
     }
+
+    public function testDelete()
+    {
+        /** @var Cart $cart */
+        $cart = simpla('cart');
+        $cart->empty_cart();
+
+        $variant        = new Variant();
+        $variant->id    = $this->faker->unique()->numberBetween();
+        $variant->stock = 10;
+
+        $cart->add_purchase(new Purchase($variant, $amount1 = rand(1, 10)));
+
+        $cart->delete_purchase($variant->id);
+
+        $this->assertEquals($cart->get_total_products(), 0);
+    }
 }

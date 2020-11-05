@@ -50,7 +50,7 @@ class CartSessionStorage implements CartStorageInterface
     /**
      * @param array $items
      */
-    public function save_items(array $items): void
+    public function save_items(array $items = []): void
     {
         $_SESSION[static::CART_KEY] = $items;
     }

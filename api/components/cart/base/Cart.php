@@ -108,7 +108,7 @@ class Cart
 
     public function save(): void
     {
-        $this->storage->save_items($this->get_purchases()->toArray());
+        $this->storage->save_items($this->purchases ? $this->purchases->toArray() : []);
     }
 
     /**
