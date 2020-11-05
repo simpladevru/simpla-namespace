@@ -13,7 +13,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Variant extends Model
 {
-    protected $table = 's_variants';
+    protected $table  = 's_variants';
+
+    protected $fillable = ['price', 'stock'];
 
     /**
      * @return int

@@ -73,15 +73,14 @@ class Cart
     }
 
     /**
-     * @param int $variant_id
-     * @param int $amount
+     * @param Purchase $purchase
      */
-    public function add_purchase(int $variant_id, int $amount = 1): void
+    public function add_purchase(Purchase $purchase): void
     {
-        if ($this->has_purchase($variant_id)) {
-            $this->get_purchase($variant_id)->add_amount($amount);
+        if ($this->has_purchase($purchase->get_id())) {
+            $this->get_purchase($purchase->get_id())->add_amount($purchase->get_amount());
         } else {
-            $this->purchases->put($variant_id, new Purchase(Variant::findOrFail($variant_id), (int) $amount));
+            $this->purchases->put($purchase->get_id(), $purchase);
         }
     }
 

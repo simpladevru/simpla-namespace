@@ -42,6 +42,15 @@ private static $installed = array (
       ),
       'reference' => 'f350df0268e904597e3bd9c4685c53e0e333feea',
     ),
+    'fzaninotto/faker' => 
+    array (
+      'pretty_version' => 'v1.9.1',
+      'version' => '1.9.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'fc10d778e4b84d5bd315dad194661e091d307c6f',
+    ),
     'illuminate/collections' => 
     array (
       'pretty_version' => 'v8.13.0',
