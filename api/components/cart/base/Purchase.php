@@ -19,7 +19,7 @@ class Purchase implements Arrayable
     public function __construct(Variant $variant, int $amount)
     {
         $this->variant = $variant;
-        $this->update_amount($amount);
+        $this->change_amount($amount);
     }
 
     /**
@@ -81,7 +81,7 @@ class Purchase implements Arrayable
     /**
      * @param int $amount
      */
-    public function update_amount(int $amount)
+    public function change_amount(int $amount)
     {
         $this->amount = $this->variant->getAvailableStockByAmount(max(1, $amount));
     }
@@ -91,7 +91,7 @@ class Purchase implements Arrayable
      */
     public function add_amount(int $amount)
     {
-        $this->update_amount($amount + $this->amount);
+        $this->change_amount($amount + $this->amount);
     }
 
     /**
