@@ -3,8 +3,6 @@
 namespace Root\tests\Unit\Entities\Shop\Catalog;
 
 use Api\entities\shop\catalog\Variant;
-use Faker\Factory;
-use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 
 class VariantTest extends TestCase
