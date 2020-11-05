@@ -113,10 +113,7 @@ class Cart
     {
         $this->storage->save_items(
             $this->get_purchases()->map(function (Purchase $purchase) {
-                return [
-                    'variant_id' => $purchase->get_id(),
-                    'amount'     => $purchase->get_amount(),
-                ];
+                return ['variant_id' => $purchase->get_id(), 'amount' => $purchase->get_amount()];
             })->all()
         );
     }
