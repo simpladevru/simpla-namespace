@@ -8,7 +8,6 @@ use Api\entities\shop\catalog\Variant;
 
 class Purchase
 {
-    private Product $product;
     private Variant $variant;
     private int      $amount;
 
@@ -18,7 +17,6 @@ class Purchase
      */
     public function __construct(Variant $variant, int $amount)
     {
-        $this->product = $variant->product;
         $this->variant = $variant;
         $this->amount  = $amount;
     }
@@ -36,7 +34,7 @@ class Purchase
      */
     public function get_product(): Product
     {
-        return $this->product;
+        return $this->variant->product;
     }
 
     /**
@@ -52,7 +50,7 @@ class Purchase
      */
     public function get_image(): ?Image
     {
-        return $this->product->images->first();
+        return $this->variant->product->images->first();
     }
 
     /**
