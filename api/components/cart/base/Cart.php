@@ -131,13 +131,14 @@ class Cart
             $storage_items = $this->storage->get_items();
 
             $variants = Variant::query()
-                ->whereIn('id', array_keys($storage_items))
+                ->whereIn('id', array_keys($this->storage->get_items()))
                 ->with(['product', 'product.images'])
                 ->get()->groupBy('id');
 
             foreach ($storage_items as $storage_item) {
-                $variant = $variants->get($storage_item['variant_id'])->first();
-                $this->purchases->put($variant->id, new Purchase($variant, (int) $storage_item['amount']));
+                if ($variant = $variants->get($storage_item['variant_id'])->first()) {
+                    $this->purchases->put($variant->id, new Purchase($variant, (int) $storage_item['amount']));
+                }
             }
         }
 
