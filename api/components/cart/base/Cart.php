@@ -4,6 +4,7 @@ namespace Root\api\components\cart\base;
 
 use Api\components\cart\base\Purchase;
 use Api\entities\shop\catalog\Variant;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Root\api\DatabaseIlluminate;
 
@@ -129,11 +130,7 @@ class Cart
 
         if ($this->purchases->isEmpty() && $this->storage->has_items()) {
             $storage_items = $this->storage->get_items();
-
-            $variants = Variant::query()
-                ->whereIn('id', array_keys($this->storage->get_items()))
-                ->with(['product', 'product.images'])
-                ->get()->groupBy('id');
+            $variants      = $this->get_variants_by_ids(array_keys($this->storage->get_items()));
 
             foreach ($storage_items as $storage_item) {
                 if ($variant = $variants->get($storage_item['variant_id'])->first()) {
@@ -143,5 +140,15 @@ class Cart
         }
 
         return $this->purchases;
+    }
+
+    /**
+     * @param array $ids
+     * @return EloquentCollection
+     */
+    private function get_variants_by_ids(array $ids): EloquentCollection
+    {
+        return Variant::query()->whereIn('id', $ids)->with(['product', 'product.images'])
+            ->get()->groupBy('id');
     }
 }
