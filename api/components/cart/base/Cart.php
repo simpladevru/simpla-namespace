@@ -78,8 +78,6 @@ class Cart
      */
     public function add_purchase(int $variant_id, int $amount = 1): void
     {
-        $amount = max(1, $amount);
-
         if ($this->has_purchase($variant_id)) {
             $this->get_purchase($variant_id)->add_amount($amount);
         } else {
