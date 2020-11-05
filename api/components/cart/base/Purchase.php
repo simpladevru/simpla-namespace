@@ -5,8 +5,9 @@ namespace Api\components\cart\base;
 use Api\entities\shop\catalog\Image;
 use Api\entities\shop\catalog\Product;
 use Api\entities\shop\catalog\Variant;
+use Illuminate\Contracts\Support\Arrayable;
 
-class Purchase
+class Purchase implements Arrayable
 {
     private Variant $variant;
     private int      $amount;
@@ -91,5 +92,13 @@ class Purchase
     public function add_amount(int $amount)
     {
         $this->update_amount($amount + $this->amount);
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return ['variant_id' => $this->get_id(), 'amount' => $this->get_amount()];
     }
 }
