@@ -27,7 +27,7 @@ class Cart
      */
     public function get_total_price()
     {
-        return $this->get_purchases()->sum(fn(Purchase $purchase) => $purchase->get_cost());
+        return $this->load_items()->sum(fn(Purchase $purchase) => $purchase->get_cost());
     }
 
     /**
@@ -35,7 +35,7 @@ class Cart
      */
     public function get_total_products()
     {
-        return $this->get_purchases()->sum(fn(Purchase $purchase) => $purchase->get_amount());
+        return $this->load_items()->sum(fn(Purchase $purchase) => $purchase->get_amount());
     }
 
     /**
@@ -44,7 +44,7 @@ class Cart
      */
     public function get_purchase(int $variant_id): ?Purchase
     {
-        return $this->get_purchases()->get($variant_id, null);
+        return $this->load_items()->get($variant_id, null);
     }
 
     /**
@@ -53,7 +53,7 @@ class Cart
      */
     public function has_purchase(int $variant_id): bool
     {
-        return $this->get_purchases()->has($variant_id);
+        return $this->load_items()->has($variant_id);
     }
 
     /**
@@ -61,7 +61,7 @@ class Cart
      */
     public function has_purchases(): bool
     {
-        return $this->get_purchases()->isNotEmpty();
+        return $this->load_items()->isNotEmpty();
     }
 
     /**
