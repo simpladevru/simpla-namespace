@@ -6,7 +6,6 @@ use Root\api\components\cart\base\Cart;
 use Root\api\components\design\smarty\AppExtension;
 use Root\api\components\design\smarty\RegisterSmartyExtension;
 use Root\api\Simpla;
-use Root\view\SmartyExtensions\ShopExtension;
 
 session_start();
 
@@ -17,7 +16,6 @@ $simpla = Simpla::$container;
 
 RegisterSmartyExtension::extensions([
     AppExtension::class,
-    ShopExtension::class,
 ]);
 
 /** @var Cart $cart */
