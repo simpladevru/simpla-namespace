@@ -19,7 +19,7 @@ class Cart
      */
     public function __construct(CartStorageInterface $storage, DatabaseIlluminate $dbl)
     {
-        $this->storage  = $storage;
+        $this->storage = $storage;
     }
 
     /**
