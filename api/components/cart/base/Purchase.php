@@ -2,6 +2,7 @@
 
 namespace Api\components\cart\base;
 
+use Api\entities\shop\catalog\Image;
 use Api\entities\shop\catalog\Product;
 use Api\entities\shop\catalog\Variant;
 
@@ -47,6 +48,14 @@ class Purchase
     }
 
     /**
+     * @return Image|null
+     */
+    public function get_image(): ?Image
+    {
+        return $this->product->images->first();
+    }
+
+    /**
      * @return int
      */
     public function get_amount(): int
@@ -75,7 +84,7 @@ class Purchase
      */
     public function update_amount(int $amount)
     {
-        $this->amount = min($amount, $this->variant->stock);
+        $this->amount = $this->variant->getAvailableStockByAmount($amount);
     }
 
     /**
