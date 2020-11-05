@@ -6,6 +6,7 @@ interface CartStorageInterface
 {
     public function has_items();
     public function get_items();
+    public function get_item_ids();
 
     public function save_items(array $items);
     public function clear();

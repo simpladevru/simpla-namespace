@@ -40,6 +40,14 @@ class CartSessionStorage implements CartStorageInterface
     }
 
     /**
+     * @return array
+     */
+    public function get_item_ids(): array
+    {
+        return array_keys($this->get_items());
+    }
+
+    /**
      * @param array $items
      */
     public function save_items(array $items): void

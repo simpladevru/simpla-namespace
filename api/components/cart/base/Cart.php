@@ -121,7 +121,7 @@ class Cart
 
         if ($this->purchases->isEmpty() && $this->storage->has_items()) {
             $storage_items = $this->storage->get_items();
-            $variants      = $this->get_variants_by_ids(array_keys($this->storage->get_items()));
+            $variants      = $this->get_variants_by_ids($this->storage->get_item_ids());
 
             foreach ($storage_items as $storage_item) {
                 if ($variant = $variants->get($storage_item['variant_id'])->first()) {
